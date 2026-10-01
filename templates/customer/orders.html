@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block title %}My Orders | JerseyHub{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="fw-bold text-white mb-1"><i class="bi bi-box-seam-fill text-success me-2"></i>My Orders</h2>
+      <p class="text-muted small">View complete order history and real-time shipment status.</p>
+    </div>
+    <a href="{{ url_for('products.list_products') }}" class="btn btn-sm btn-jh-primary">
+      <i class="bi bi-cart-plus me-1"></i> Order New Jerseys
+    </a>
+  </div>
+
+  {% if orders %}
+    <div class="d-flex flex-column gap-3">
+      {% for order in orders %}
+        <div class="card bg-dark border-secondary border-opacity-25 rounded-3 p-4">
+          <div class="row align-items-center g-3">
+            
+            <div class="col-md-3">
+              <span class="text-muted small d-block">Order #</span>
+              <strong class="text-white font-monospace text-success">{{ order.order_number }}</strong>
+              <div class="text-muted small mt-1">{{ order.created_at.strftime('%B %d, %Y at %I:%M %p') }}</div>
+            </div>
+
+            <div class="col-md-3">
+              <span class="text-muted small d-block">Shipment Status</span>
+              {% if order.status == 'Pending' %}
+                <span class="badge bg-warning text-dark px-3 py-1">Pending Confirmation</span>
+              {% elif order.status == 'Processing' %}
+                <span class="badge bg-primary px-3 py-1">Processing Kit</span>
+              {% elif order.status == 'Shipped' %}
+                <span class="badge bg-info text-dark px-3 py-1">Dispatched & In Transit</span>
+              {% elif order.status == 'Delivered' %}
+                <span class="badge bg-success px-3 py-1">Delivered</span>
+              {% elif order.status == 'Cancelled' %}
+                <span class="badge bg-danger px-3 py-1">Cancelled</span>
+              {% endif %}
+            </div>
+
+            <div class="col-md-2">
+              <span class="text-muted small d-block">Items & Total</span>
+              <strong class="text-white">{{ order.items_count }} Jerseys</strong>
+              <div class="fw-bold text-success">₹{{ "%.2f"|format(order.total_amount) }}</div>
+            </div>
+
+            <div class="col-md-2">
+              <span class="text-muted small d-block">Payment</span>
+              <span class="text-white-50 small">{{ order.payment.payment_method if order.payment else 'Online' }}</span>
+              <div class="badge bg-secondary small">{{ order.payment.payment_status if order.payment else 'Completed' }}</div>
+            </div>
+
+            <div class="col-md-2 text-md-end">
+              <a href="{{ url_for('orders.detail', order_number=order.order_number) }}" class="btn btn-sm btn-jh-outline w-100">
+                Track & Details <i class="bi bi-arrow-right ms-1"></i>
+              </a>
+            </div>
+
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="text-center py-5 bg-dark rounded-4 border border-secondary border-opacity-25 p-5">
+      <i class="bi bi-box-seam display-1 text-muted mb-3"></i>
+      <h4 class="fw-bold text-white mb-2">No Orders Found</h4>
+      <p class="text-muted">You haven't placed any orders with JerseyHub yet.</p>
+      <a href="{{ url_for('products.list_products') }}" class="btn btn-jh-primary mt-2">
+        Start Shopping Now
+      </a>
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}

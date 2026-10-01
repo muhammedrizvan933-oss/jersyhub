@@ -1,0 +1,171 @@
+{% extends 'base.html' %}
+
+{% block title %}Shopping Cart | JerseyHub{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold text-white mb-0"><i class="bi bi-bag-check-fill text-success me-2"></i>Your Shopping Cart</h2>
+    {% if items %}
+      <form action="{{ url_for('cart.clear_cart') }}" method="POST" onsubmit="return confirm('Are you sure you want to clear your cart?');">
+        <button type="submit" class="btn btn-sm btn-outline-danger">
+          <i class="bi bi-trash3"></i> Clear Cart
+        </button>
+      </form>
+    {% endif %}
+  </div>
+
+  {% if items %}
+    <div class="row g-4">
+      
+      <!-- CART ITEMS LIST -->
+      <div class="col-lg-8">
+        
+        <!-- Free shipping progress banner -->
+        {% if subtotal < 6000.0 %}
+          <div class="alert alert-dark border-secondary border-opacity-50 small mb-3">
+            <div class="d-flex justify-content-between mb-1">
+              <span>Add <strong>₹{{ "%.2f"|format(6000.0 - subtotal) }}</strong> more to unlock <strong>FREE Express Shipping in India!</strong></span>
+              <span>{{ ((subtotal / 6000.0) * 100)|round|int }}%</span>
+            </div>
+            <div class="progress" style="height: 6px;">
+              <div class="progress-bar bg-success" role="progressbar" style="width: {{ (subtotal / 6000.0) * 100 }}%"></div>
+            </div>
+          </div>
+        {% else %}
+          <div class="alert alert-success border-success small mb-3">
+            <i class="bi bi-check-circle-fill me-1"></i> Congratulations! You've unlocked <strong>FREE Express Shipping in India!</strong>
+          </div>
+        {% endif %}
+
+        <div class="card bg-dark border-secondary border-opacity-25 rounded-3 overflow-hidden">
+          <div class="table-responsive">
+            <table class="table table-dark align-middle mb-0">
+              <thead class="text-muted small text-uppercase" style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+                <tr>
+                  <th scope="col" style="min-width: 250px;">Jersey</th>
+                  <th scope="col">Price</th>
+                  <th scope="col" style="min-width: 130px;">Quantity</th>
+                  <th scope="col">Total</th>
+                  <th scope="col" class="text-end">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for item in items %}
+                  <tr style="border-bottom: 1px solid rgba(255,255,255,0.04);">
+                    <td>
+                      <div class="d-flex align-items-center gap-3">
+                        <img src="{{ item.product.primary_image }}" alt="{{ item.product.name }}" class="rounded" style="width: 64px; height: 64px; object-fit: cover; background: #0f1523;">
+                        <div>
+                          <a href="{{ url_for('products.detail', slug=item.product.slug) }}" class="fw-bold text-white text-decoration-none small d-block">
+                            {{ item.product.name }}
+                          </a>
+                          <span class="badge bg-secondary me-1">Size: {{ item.size }}</span>
+                          <span class="text-muted small">{{ item.product.team.name }}</span>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <div class="fw-bold text-white-50">₹{{ "%.2f"|format(item.price) }}</div>
+                    </td>
+                    <td>
+                      <!-- Inline Quantity Updater -->
+                      <form action="{{ url_for('cart.update_cart', item_id=item.id) }}" method="POST" class="d-flex align-items-center gap-1">
+                        <button type="submit" name="action" value="decrease" class="btn btn-sm btn-secondary py-0 px-2">-</button>
+                        <input type="text" name="quantity" value="{{ item.quantity }}" class="form-control form-control-sm text-center bg-dark text-white border-secondary p-1" style="width: 45px;" readonly>
+                        <button type="submit" name="action" value="increase" class="btn btn-sm btn-secondary py-0 px-2" {% if item.quantity >= item.max_stock %}disabled{% endif %}>+</button>
+                      </form>
+                      {% if item.quantity >= item.max_stock %}
+                        <div class="text-warning text-nowrap" style="font-size: 0.7rem;">Max stock reached</div>
+                      {% endif %}
+                    </td>
+                    <td>
+                      <div class="fw-bold text-success">₹{{ "%.2f"|format(item.line_total) }}</div>
+                    </td>
+                    <td class="text-end">
+                      <a href="{{ url_for('cart.remove_from_cart', item_id=item.id) }}" class="btn btn-sm btn-outline-danger" title="Remove item">
+                        <i class="bi bi-trash"></i>
+                      </a>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mt-3">
+          <a href="{{ url_for('products.list_products') }}" class="btn btn-sm btn-jh-outline">
+            <i class="bi bi-arrow-left me-1"></i> Continue Shopping
+          </a>
+        </div>
+
+      </div>
+
+      <!-- ORDER SUMMARY CARD -->
+      <div class="col-lg-4">
+        <div class="card bg-dark border-secondary border-opacity-25 rounded-3 p-4 sticky-top" style="top: 80px;">
+          <h5 class="fw-bold text-white mb-3 pb-2 border-bottom border-secondary border-opacity-25">Order Summary</h5>
+          
+          <div class="d-flex justify-content-between mb-2">
+            <span class="text-white-50">Subtotal</span>
+            <span class="fw-bold text-white">₹{{ "%.2f"|format(subtotal) }}</span>
+          </div>
+
+          <div class="d-flex justify-content-between mb-2">
+            <span class="text-white-50">Estimated Shipping</span>
+            <span class="fw-bold {% if shipping_fee == 0 %}text-success{% else %}text-white{% endif %}">
+              {% if shipping_fee == 0 %}FREE{% else %}₹{{ "%.2f"|format(shipping_fee) }}{% endif %}
+            </span>
+          </div>
+
+          <div class="d-flex justify-content-between mb-3 pb-3 border-bottom border-secondary border-opacity-25">
+            <span class="text-white-50">Estimated Tax</span>
+            <span class="text-white-50">₹0.00</span>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-baseline mb-4">
+            <span class="fs-5 fw-bold text-white">Grand Total</span>
+            <span class="display-6 fw-bold text-success">₹{{ "%.2f"|format(grand_total) }}</span>
+          </div>
+
+          {% if current_user.is_authenticated %}
+            <a href="{{ url_for('checkout.checkout') }}" class="btn btn-jh-primary w-100 py-3 fs-6">
+              <i class="bi bi-credit-card-2-front-fill me-1"></i> Proceed to Checkout
+            </a>
+          {% else %}
+            <a href="{{ url_for('auth.login', next=url_for('checkout.checkout')) }}" class="btn btn-jh-primary w-100 py-3 fs-6 mb-2">
+              <i class="bi bi-box-arrow-in-right me-1"></i> Log In to Checkout
+            </a>
+            <div class="text-center small text-muted">
+              Don't have an account? <a href="{{ url_for('auth.register') }}" class="text-success fw-bold">Sign up</a>
+            </div>
+          {% endif %}
+
+          <div class="d-flex align-items-center justify-content-center gap-3 text-muted small mt-4 pt-3 border-top border-secondary border-opacity-25">
+            <span><i class="bi bi-shield-check text-success"></i> 256-bit SSL</span>
+            <span><i class="bi bi-award text-warning"></i> Authentic</span>
+            <span><i class="bi bi-arrow-repeat text-info"></i> 30-Day Returns</span>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  {% else %}
+    <div class="text-center py-5 bg-dark rounded-4 border border-secondary border-opacity-25 p-5">
+      <div class="mb-3 text-muted display-1">
+        <i class="bi bi-cart-x"></i>
+      </div>
+      <h3 class="fw-bold text-white mb-2">Your Shopping Cart is Empty</h3>
+      <p class="text-muted mx-auto mb-4" style="max-width: 480px;">
+        Looks like you haven't added any football jerseys to your cart yet. Explore our latest kits and classic throwbacks!
+      </p>
+      <a href="{{ url_for('products.list_products') }}" class="btn btn-jh-primary btn-lg fs-6 px-4">
+        <i class="bi bi-grid-fill me-1"></i> Explore Football Jerseys
+      </a>
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}

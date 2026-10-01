@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block title %}404 - Jersey Not Found | JerseyHub{% endblock %}
+
+{% block content %}
+<div class="container py-5 text-center">
+  <div class="py-5">
+    <div class="display-1 fw-bold text-success mb-2">404</div>
+    <h2 class="fw-bold text-white mb-3">Pitch Out of Bounds!</h2>
+    <p class="text-muted mx-auto mb-4" style="max-width: 500px;">
+      The jersey page or kit collection you are searching for might have transferred to another club or does not exist.
+    </p>
+    <a href="{{ url_for('main.home') }}" class="btn btn-jh-primary px-4 py-2">
+      <i class="bi bi-house-door-fill me-1"></i> Return to Homepage
+    </a>
+  </div>
+</div>
+{% endblock %}

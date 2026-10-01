@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+
+{% block title %}My Profile | JerseyHub{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="mb-4">
+    <h2 class="fw-bold text-white mb-1"><i class="bi bi-person-circle text-success me-2"></i>My Profile</h2>
+    <p class="text-muted small">Manage your contact details, shipping address, and password.</p>
+  </div>
+
+  <div class="row g-4">
+    
+    <!-- LEFT: PROFILE STATS & RECENT ORDERS -->
+    <div class="col-lg-4">
+      <div class="card bg-dark border-secondary border-opacity-25 rounded-3 p-4 mb-4 text-center">
+        <div class="mx-auto rounded-circle bg-success bg-opacity-20 text-success d-flex align-items-center justify-content-center display-4 mb-3" style="width: 80px; height: 80px; border: 2px solid #00e676;">
+          {{ current_user.username[:1].upper() }}
+        </div>
+        <h4 class="fw-bold text-white mb-1">{{ current_user.full_name or current_user.username }}</h4>
+        <div class="text-muted small mb-3">{{ current_user.email }}</div>
+        
+        <div class="d-flex justify-content-around p-3 bg-secondary bg-opacity-10 rounded-3 border border-secondary border-opacity-25">
+          <div>
+            <div class="fs-4 fw-bold text-white">{{ current_user.orders_count }}</div>
+            <div class="text-muted small">Orders</div>
+          </div>
+          <div class="border-start border-secondary border-opacity-25"></div>
+          <div>
+            <div class="fs-4 fw-bold text-success">₹{{ "%.2f"|format(current_user.total_spent) }}</div>
+            <div class="text-muted small">Total Spent</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Recent Orders -->
+      <div class="card bg-dark border-secondary border-opacity-25 rounded-3 p-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h6 class="fw-bold text-white mb-0">Recent Orders</h6>
+          <a href="{{ url_for('orders.my_orders') }}" class="btn btn-sm btn-link text-success p-0 text-decoration-none">View All</a>
+        </div>
+
+        {% if recent_orders %}
+          <div class="d-flex flex-column gap-2">
+            {% for o in recent_orders %}
+              <a href="{{ url_for('orders.detail', order_number=o.order_number) }}" class="p-2 rounded bg-secondary bg-opacity-10 text-decoration-none d-flex justify-content-between align-items-center text-white small">
+                <div>
+                  <div class="fw-bold font-monospace text-success">{{ o.order_number }}</div>
+                  <div class="text-muted" style="font-size: 0.72rem;">{{ o.created_at.strftime('%b %d, %Y') }}</div>
+                </div>
+                <div class="text-end">
+                  <div class="fw-bold">₹{{ "%.2f"|format(o.total_amount) }}</div>
+                  <span class="badge bg-secondary" style="font-size: 0.65rem;">{{ o.status }}</span>
+                </div>
+              </a>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p class="text-muted small mb-0">No past orders yet.</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- RIGHT: EDIT FORMS -->
+    <div class="col-lg-8">
+      
+      <!-- 1. Edit Profile & Address Form -->
+      <div class="card bg-dark border-secondary border-opacity-25 rounded-3 p-4 mb-4">
+        <h5 class="fw-bold text-white mb-3"><i class="bi bi-person-lines-fill text-info me-2"></i>Personal & Shipping Information</h5>
+
+        <form action="{{ url_for('auth.profile') }}" method="POST">
+          <input type="hidden" name="action" value="update_profile">
+
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Full Name</label>
+              <input type="text" name="full_name" class="form-control" value="{{ current_user.full_name or '' }}" placeholder="John Doe">
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">Phone Number</label>
+              <input type="tel" name="phone" class="form-control" value="{{ current_user.phone or '' }}" placeholder="+1 (555) 000-0000">
+            </div>
+
+            <div class="col-12">
+              <label class="form-label">Default Street Address</label>
+              <input type="text" name="address" class="form-control" value="{{ current_user.address or '' }}" placeholder="123 Football Blvd, Apt 4B">
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label">City</label>
+              <input type="text" name="city" class="form-control" value="{{ current_user.city or '' }}">
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label">State / Province</label>
+              <input type="text" name="state" class="form-control" value="{{ current_user.state or '' }}">
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label">Postal / ZIP Code</label>
+              <input type="text" name="postal_code" class="form-control" value="{{ current_user.postal_code or '' }}">
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">Country</label>
+              <input type="text" name="country" class="form-control" value="{{ current_user.country or 'India' }}">
+            </div>
+
+            <div class="col-12 mt-4">
+              <button type="submit" class="btn btn-jh-primary">
+                <i class="bi bi-save me-1"></i> Save Profile Details
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <!-- 2. Change Password Form -->
+      <div class="card bg-dark border-secondary border-opacity-25 rounded-3 p-4">
+        <h5 class="fw-bold text-white mb-3"><i class="bi bi-key-fill text-warning me-2"></i>Change Password</h5>
+
+        <form action="{{ url_for('auth.profile') }}" method="POST">
+          <input type="hidden" name="action" value="change_password">
+
+          <div class="row g-3">
+            <div class="col-md-4">
+              <label class="form-label">Current Password *</label>
+              <input type="password" name="old_password" class="form-control" required>
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label">New Password *</label>
+              <input type="password" name="new_password" class="form-control" minlength="6" required>
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label">Confirm New Password *</label>
+              <input type="password" name="confirm_new_password" class="form-control" minlength="6" required>
+            </div>
+
+            <div class="col-12 mt-3">
+              <button type="submit" class="btn btn-jh-outline">
+                <i class="bi bi-shield-lock me-1"></i> Update Password
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+{% endblock %}

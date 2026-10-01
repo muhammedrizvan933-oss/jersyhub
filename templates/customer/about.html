@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block title %}About Us | JerseyHub{% endblock %}
+
+{% block content %}
+<!-- ABOUT HERO -->
+<section class="py-5" style="background: linear-gradient(135deg, #0e1526 0%, #161f33 100%); border-bottom: 1px solid rgba(255,255,255,0.06);">
+  <div class="container py-4 text-center">
+    <span class="section-tag">Our Football Legacy</span>
+    <h1 class="display-4 fw-bold text-white mb-3">Authentic Passion. Legendary Jerseys.</h1>
+    <p class="text-white-50 mx-auto fs-5" style="max-width: 680px;">
+      Founded by dedicated football aficionados, JerseyHub is the premier global destination for official football shirts, match kits, and historic retro editions.
+    </p>
+  </div>
+</section>
+
+<div class="container py-5">
+  
+  <div class="row align-items-center g-5 mb-5">
+    <div class="col-lg-6">
+      <h2 class="fw-bold text-white mb-3">Crafted for the Pitch, Tailored for the Street</h2>
+      <p class="text-white-50" style="line-height: 1.7;">
+        Football jerseys are more than mere sports apparel—they embody heritage, identity, unforgettable victories, and deep-seated community pride. At JerseyHub, we ensure that every supporter has direct access to the finest match-issue kits and retro icons from Europe’s elite leagues and South American powerhouses.
+      </p>
+      <p class="text-white-50" style="line-height: 1.7;">
+        Whether you are searching for Real Madrid’s regal home kit, Barcelona’s anniversary colors, the Azzurri blue of Italy, or Argentina’s World Cup triumph, our team ensures 100% verified authenticity and rapid delivery.
+      </p>
+      
+      <div class="row g-3 mt-2">
+        <div class="col-6">
+          <div class="p-3 rounded bg-dark border border-secondary border-opacity-25">
+            <h3 class="fw-bold text-success mb-1">{{ total_jerseys }}+</h3>
+            <span class="text-muted small">Official Match Shirts</span>
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="p-3 rounded bg-dark border border-secondary border-opacity-25">
+            <h3 class="fw-bold text-info mb-1">{{ total_teams }}+</h3>
+            <span class="text-muted small">Clubs & Nations</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-6 text-center">
+      <img src="https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800&auto=format&fit=crop&q=80" alt="Football Pitch Stadium" class="img-fluid rounded-4 shadow-lg border border-secondary border-opacity-25">
+    </div>
+  </div>
+
+  <!-- CORE VALUES -->
+  <div class="py-4">
+    <div class="text-center mb-5">
+      <span class="section-tag">Guarantees</span>
+      <h2 class="section-title">The JerseyHub Standards</h2>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="feature-box">
+          <div class="feature-icon-wrap">
+            <i class="bi bi-shield-check"></i>
+          </div>
+          <h5 class="feature-title">Anti-Counterfeit Check</h5>
+          <p class="feature-desc">Every kit undergoes thorough fabric density inspection, official patch verification, and manufacturer tag cross-referencing.</p>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="feature-box">
+          <div class="feature-icon-wrap">
+            <i class="bi bi-fire"></i>
+          </div>
+          <h5 class="feature-title">Collector Retro Archive</h5>
+          <p class="feature-desc">We curate rare throwback editions, from Camp Nou 1999 to the 2004 Arsenal Invincibles, preserving football history.</p>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="feature-box">
+          <div class="feature-icon-wrap">
+            <i class="bi bi-people-fill"></i>
+          </div>
+          <h5 class="feature-title">Supporters-First Ethos</h5>
+          <p class="feature-desc">Fast responsive support, accurate size guides, flexible exchanges, and community-driven rewards.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block title %}Order Confirmed | JerseyHub{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      
+      <div class="card bg-dark border-secondary border-opacity-25 rounded-4 p-4 p-md-5 text-center shadow-lg">
+        
+        <!-- Big Success Checkmark -->
+        <div class="mb-4">
+          <div class="mx-auto rounded-circle bg-success bg-opacity-10 d-flex align-items-center justify-content-center text-success display-3" style="width: 100px; height: 100px; border: 2px solid #00e676;">
+            <i class="bi bi-check-lg"></i>
+          </div>
+        </div>
+
+        <span class="badge bg-success mb-2 px-3 py-1 fs-6">ORDER CONFIRMED</span>
+        <h2 class="fw-bold text-white mb-2">Thank you for your purchase!</h2>
+        <p class="text-white-50 mx-auto mb-4" style="max-width: 500px;">
+          Your official football jerseys are being prepared for dispatch. We have received your order and payment authorization.
+        </p>
+
+        <!-- Order Summary Card -->
+        <div class="p-4 rounded-3 bg-secondary bg-opacity-10 border border-secondary border-opacity-25 text-start mb-4">
+          <div class="row g-3">
+            <div class="col-sm-6">
+              <span class="text-muted small d-block">Order Number</span>
+              <strong class="text-white fs-5 font-monospace text-success">{{ order.order_number }}</strong>
+            </div>
+            <div class="col-sm-6">
+              <span class="text-muted small d-block">Estimated Delivery Date</span>
+              <strong class="text-white">{{ est_delivery }}</strong>
+            </div>
+            <div class="col-sm-6">
+              <span class="text-muted small d-block">Payment Method & Status</span>
+              <strong class="text-white">{{ order.payment.payment_method }} ({{ order.payment.payment_status }})</strong>
+              <div class="text-muted small font-monospace">{{ order.payment.transaction_id }}</div>
+            </div>
+            <div class="col-sm-6">
+              <span class="text-muted small d-block">Shipping To</span>
+              <strong class="text-white">{{ order.shipping_name }}</strong>
+              <div class="text-muted small">{{ order.shipping_city }}, {{ order.shipping_state }} {{ order.shipping_postal_code }}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Ordered Items Breakdown -->
+        <div class="text-start mb-4">
+          <h6 class="fw-bold text-white mb-3">Items in This Shipment</h6>
+          <div class="d-flex flex-column gap-2">
+            {% for item in order.items %}
+              <div class="d-flex justify-content-between align-items-center p-2 rounded bg-dark border border-secondary border-opacity-25">
+                <div class="d-flex align-items-center gap-3">
+                  <span class="badge bg-secondary">Size {{ item.size }}</span>
+                  <span class="text-white small fw-bold">{{ item.product_name }}</span>
+                  <span class="text-muted small">× {{ item.quantity }}</span>
+                </div>
+                <div class="fw-bold text-success small">₹{{ "%.2f"|format(item.total_price) }}</div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="d-flex flex-wrap justify-content-center gap-3">
+          <a href="{{ url_for('orders.detail', order_number=order.order_number) }}" class="btn btn-jh-primary px-4 py-2">
+            <i class="bi bi-box-seam me-1"></i> Track Live Status
+          </a>
+          <a href="{{ url_for('orders.my_orders') }}" class="btn btn-jh-outline px-4 py-2">
+            View All Orders
+          </a>
+          <a href="{{ url_for('products.list_products') }}" class="btn btn-jh-outline px-4 py-2">
+            Continue Shopping
+          </a>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

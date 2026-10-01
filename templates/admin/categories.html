@@ -1,0 +1,162 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}Leagues & Teams | JerseyHub Admin{% endblock %}
+{% block page_title %}Leagues & Clubs Management{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+  
+  <!-- LEFT: CATEGORIES / LEAGUES -->
+  <div class="col-lg-6">
+    <div class="card bg-dark border-secondary border-opacity-25 rounded-3 p-4 mb-4">
+      <h5 class="fw-bold text-white mb-3"><i class="bi bi-folder-plus text-success me-2"></i>Add League / Category</h5>
+      
+      <form action="{{ url_for('admin.categories') }}" method="POST">
+        <input type="hidden" name="action" value="add_category">
+
+        <div class="mb-3">
+          <label class="form-label small text-muted">Category / League Name *</label>
+          <input type="text" name="name" class="form-control form-control-sm" placeholder="e.g. Eredivisie / Copa Libertadores" required>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label small text-muted">Description</label>
+          <input type="text" name="description" class="form-control form-control-sm" placeholder="Top flight tournament...">
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label small text-muted">Cover Banner Image URL</label>
+          <input type="url" name="image_url" class="form-control form-control-sm" placeholder="https://...">
+        </div>
+
+        <button type="submit" class="btn btn-sm btn-success">
+          <i class="bi bi-plus-lg me-1"></i> Create Category
+        </button>
+      </form>
+    </div>
+
+    <!-- Existing Categories List -->
+    <div class="admin-table">
+      <div class="p-3 border-bottom border-secondary border-opacity-25">
+        <h6 class="fw-bold text-white mb-0">Existing Leagues ({{ categories|length }})</h6>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table mb-0">
+          <thead>
+            <tr>
+              <th>League</th>
+              <th>Teams</th>
+              <th>Jerseys</th>
+              <th class="text-end">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for cat in categories %}
+              <tr>
+                <td>
+                  <strong class="text-white small">{{ cat.name }}</strong>
+                  <div class="text-muted font-monospace" style="font-size: 0.72rem;">{{ cat.slug }}</div>
+                </td>
+                <td>{{ cat.teams.count() }}</td>
+                <td>{{ cat.products.count() }}</td>
+                <td class="text-end">
+                  <form action="{{ url_for('admin.categories') }}" method="POST" class="d-inline" onsubmit="return confirm('Delete this category? Associated teams will also be removed.');">
+                    <input type="hidden" name="action" value="delete_category">
+                    <input type="hidden" name="category_id" value="{{ cat.id }}">
+                    <button type="submit" class="btn btn-sm btn-outline-danger py-0 px-2" title="Delete">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </form>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: TEAMS MANAGEMENT -->
+  <div class="col-lg-6">
+    <div class="card bg-dark border-secondary border-opacity-25 rounded-3 p-4 mb-4">
+      <h5 class="fw-bold text-white mb-3"><i class="bi bi-shield-plus text-info me-2"></i>Add Football Team</h5>
+
+      <form action="{{ url_for('admin.categories') }}" method="POST">
+        <input type="hidden" name="action" value="add_team">
+
+        <div class="row g-2">
+          <div class="col-md-6 mb-2">
+            <label class="form-label small text-muted">Team Name *</label>
+            <input type="text" name="name" class="form-control form-control-sm" placeholder="e.g. Juventus" required>
+          </div>
+
+          <div class="col-md-6 mb-2">
+            <label class="form-label small text-muted">League / Category *</label>
+            <select name="category_id" class="form-select form-select-sm" required>
+              {% for c in categories %}
+                <option value="{{ c.id }}">{{ c.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="col-md-6 mb-2">
+            <label class="form-label small text-muted">Country</label>
+            <input type="text" name="country" class="form-control form-control-sm" placeholder="e.g. Italy">
+          </div>
+
+          <div class="col-md-6 mb-2">
+            <label class="form-label small text-muted">Logo URL</label>
+            <input type="url" name="logo_url" class="form-control form-control-sm" placeholder="https://...">
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-sm btn-info mt-2">
+          <i class="bi bi-plus-lg me-1"></i> Add Team
+        </button>
+      </form>
+    </div>
+
+    <!-- Existing Teams List -->
+    <div class="admin-table">
+      <div class="p-3 border-bottom border-secondary border-opacity-25">
+        <h6 class="fw-bold text-white mb-0">Existing Clubs & Teams ({{ teams|length }})</h6>
+      </div>
+
+      <div class="table-responsive" style="max-height: 480px; overflow-y: auto;">
+        <table class="table mb-0">
+          <thead>
+            <tr>
+              <th>Team</th>
+              <th>League</th>
+              <th>Country</th>
+              <th class="text-end">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for t in teams %}
+              <tr>
+                <td>
+                  <strong class="text-white small">{{ t.name }}</strong>
+                </td>
+                <td><span class="badge bg-secondary">{{ t.category.name if t.category else 'None' }}</span></td>
+                <td class="text-muted small">{{ t.country or '-' }}</td>
+                <td class="text-end">
+                  <form action="{{ url_for('admin.categories') }}" method="POST" class="d-inline" onsubmit="return confirm('Delete this team?');">
+                    <input type="hidden" name="action" value="delete_team">
+                    <input type="hidden" name="team_id" value="{{ t.id }}">
+                    <button type="submit" class="btn btn-sm btn-outline-danger py-0 px-2" title="Delete">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </form>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

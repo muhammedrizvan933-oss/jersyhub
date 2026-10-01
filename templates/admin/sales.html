@@ -1,0 +1,110 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}Sales Reports | JerseyHub Admin{% endblock %}
+{% block page_title %}Comprehensive Sales & Revenue Reports{% endblock %}
+
+{% block content %}
+<!-- TOP METRIC CARDS -->
+<div class="row g-4 mb-4">
+  <div class="col-md-6 col-lg-4">
+    <div class="card bg-dark border-secondary border-opacity-25 rounded-3 p-4">
+      <span class="text-muted small text-uppercase fw-bold">Total Gross Sales</span>
+      <h2 class="display-6 fw-bold text-success mb-1">₹{{ "%.2f"|format(total_gross) }}</h2>
+      <span class="text-white-50 small"><i class="bi bi-shield-check text-success me-1"></i>Excludes cancelled orders</span>
+    </div>
+  </div>
+
+  <div class="col-md-6 col-lg-8">
+    <div class="card bg-dark border-secondary border-opacity-25 rounded-3 p-4">
+      <h6 class="fw-bold text-white mb-3">Payment Methods Distribution</h6>
+      <div class="row g-3">
+        {% for m in method_breakdown %}
+          <div class="col-sm-4">
+            <div class="p-2 rounded bg-secondary bg-opacity-10 border border-secondary border-opacity-25">
+              <span class="text-muted small d-block">{{ m.payment_method }}</span>
+              <strong class="text-white fs-5">₹{{ "%.2f"|format(m.total) }}</strong>
+              <div class="text-muted" style="font-size: 0.72rem;">{{ m.count }} transactions</div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4">
+  
+  <!-- REVENUE BY CATEGORY / LEAGUE -->
+  <div class="col-lg-6">
+    <div class="admin-table h-100">
+      <div class="p-3 border-bottom border-secondary border-opacity-25">
+        <h6 class="fw-bold text-white mb-0"><i class="bi bi-pie-chart text-info me-2"></i>Revenue by League / Category</h6>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table mb-0 align-middle">
+          <thead>
+            <tr>
+              <th>League</th>
+              <th>Units Sold</th>
+              <th class="text-end">Revenue (₹)</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for cr in category_revenue %}
+              <tr>
+                <td><strong class="text-white small">{{ cr.name }}</strong></td>
+                <td>{{ cr.units }} jerseys</td>
+                <td class="text-end fw-bold text-success">₹{{ "%.2f"|format(cr.revenue) }}</td>
+              </tr>
+            {% else %}
+              <tr>
+                <td colspan="3" class="text-center py-4 text-muted">No sales recorded yet.</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOP 10 BESTSELLING JERSEYS -->
+  <div class="col-lg-6">
+    <div class="admin-table h-100">
+      <div class="p-3 border-bottom border-secondary border-opacity-25">
+        <h6 class="fw-bold text-white mb-0"><i class="bi bi-trophy text-warning me-2"></i>Top Selling Football Kits</h6>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table mb-0 align-middle">
+          <thead>
+            <tr>
+              <th>Rank</th>
+              <th>Jersey Name</th>
+              <th>Units</th>
+              <th class="text-end">Revenue</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for b in bestsellers %}
+              <tr>
+                <td><span class="badge bg-secondary">#{{ loop.index }}</span></td>
+                <td>
+                  <span class="text-white small fw-bold text-truncate d-block" style="max-width: 200px;">{{ b.product_name }}</span>
+                </td>
+                <td>{{ b.units_sold }}</td>
+                <td class="text-end fw-bold text-success">₹{{ "%.2f"|format(b.revenue) }}</td>
+              </tr>
+            {% else %}
+              <tr>
+                <td colspan="4" class="text-center py-4 text-muted">No sales recorded yet.</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,67 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}Support Inquiries | JerseyHub Admin{% endblock %}
+{% block page_title %}Customer Support & Contact Messages{% endblock %}
+
+{% block content %}
+<div class="admin-table">
+  <div class="p-3 border-bottom border-secondary border-opacity-25 d-flex justify-content-between align-items-center">
+    <h6 class="fw-bold text-white mb-0"><i class="bi bi-inbox text-success me-2"></i>Inquiries Inbox ({{ messages|length }})</h6>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table mb-0 align-middle">
+      <thead>
+        <tr>
+          <th>From</th>
+          <th>Subject & Message</th>
+          <th>Received</th>
+          <th>Status</th>
+          <th class="text-end">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for m in messages %}
+          <tr class="{% if not m.is_read %}table-active{% endif %}">
+            <td>
+              <div class="fw-bold text-white small">{{ m.name }}</div>
+              <div class="text-muted" style="font-size: 0.72rem;">{{ m.email }}</div>
+            </td>
+            <td>
+              <strong class="text-white small d-block mb-1">{{ m.subject or 'No Subject' }}</strong>
+              <p class="text-white-50 small mb-0" style="max-width: 480px; line-height: 1.4;">{{ m.message }}</p>
+            </td>
+            <td class="text-muted small">
+              {{ m.created_at.strftime('%b %d, %Y at %I:%M %p') }}
+            </td>
+            <td>
+              {% if m.is_read %}
+                <span class="badge bg-secondary">Read</span>
+              {% else %}
+                <span class="badge bg-warning text-dark">Unread</span>
+              {% endif %}
+            </td>
+            <td class="text-end">
+              {% if not m.is_read %}
+                <form action="{{ url_for('admin.mark_message_read', id=m.id) }}" method="POST">
+                  <button type="submit" class="btn btn-sm btn-outline-success py-1 px-2" title="Mark as Read">
+                    <i class="bi bi-check2"></i> Mark Read
+                  </button>
+                </form>
+              {% else %}
+                <span class="text-muted small"><i class="bi bi-check2-all text-success"></i> Done</span>
+              {% endif %}
+            </td>
+          </tr>
+        {% else %}
+          <tr>
+            <td colspan="5" class="text-center py-4 text-muted">
+              No customer inquiries received yet.
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

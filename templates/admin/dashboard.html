@@ -1,0 +1,199 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}Dashboard | JerseyHub Admin{% endblock %}
+{% block page_title %}Dashboard & Analytics{% endblock %}
+
+{% block content %}
+<!-- STAT CARDS ROW -->
+<div class="row g-4 mb-4">
+  
+  <div class="col-sm-6 col-xl-3">
+    <div class="admin-stat-card">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <div class="stat-title">Total Revenue</div>
+          <div class="stat-val text-success">₹{{ "%.2f"|format(total_sales) }}</div>
+        </div>
+        <div class="stat-icon bg-success bg-opacity-10 text-success">
+          <i class="bi bi-currency-dollar"></i>
+        </div>
+      </div>
+      <div class="small text-muted mt-2"><i class="bi bi-arrow-up-right text-success me-1"></i>Completed Transactions</div>
+    </div>
+  </div>
+
+  <div class="col-sm-6 col-xl-3">
+    <div class="admin-stat-card">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <div class="stat-title">Total Orders</div>
+          <div class="stat-val text-white">{{ total_orders }}</div>
+        </div>
+        <div class="stat-icon bg-primary bg-opacity-10 text-primary">
+          <i class="bi bi-cart-check"></i>
+        </div>
+      </div>
+      <div class="small text-muted mt-2"><i class="bi bi-box-seam me-1"></i>All Customer Orders</div>
+    </div>
+  </div>
+
+  <div class="col-sm-6 col-xl-3">
+    <div class="admin-stat-card">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <div class="stat-title">Registered Customers</div>
+          <div class="stat-val text-info">{{ total_customers }}</div>
+        </div>
+        <div class="stat-icon bg-info bg-opacity-10 text-info">
+          <i class="bi bi-people"></i>
+        </div>
+      </div>
+      <div class="small text-muted mt-2"><i class="bi bi-person-check me-1"></i>Active Customer Accounts</div>
+    </div>
+  </div>
+
+  <div class="col-sm-6 col-xl-3">
+    <div class="admin-stat-card">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <div class="stat-title">Jersey Catalog</div>
+          <div class="stat-val text-warning">{{ total_products }}</div>
+        </div>
+        <div class="stat-icon bg-warning bg-opacity-10 text-warning">
+          <i class="bi bi-tags"></i>
+        </div>
+      </div>
+      <div class="small text-muted mt-2"><i class="bi bi-shield-shaded me-1"></i>Active Club & National Kits</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- CHART & LOW STOCK ALERTS -->
+<div class="row g-4 mb-4">
+  
+  <!-- Sales Trend Chart -->
+  <div class="col-lg-8">
+    <div class="card bg-dark border-secondary border-opacity-25 rounded-3 p-4 h-100">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h6 class="fw-bold text-white mb-0"><i class="bi bi-graph-up text-success me-2"></i>Sales Revenue Dynamics</h6>
+        <span class="badge bg-secondary">Real-time DB Query</span>
+      </div>
+      <div style="position: relative; height: 300px; width: 100%;">
+        <canvas id="adminSalesChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Low Stock Alert Box -->
+  <div class="col-lg-4">
+    <div class="card bg-dark border-secondary border-opacity-25 rounded-3 p-4 h-100">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h6 class="fw-bold text-white mb-0"><i class="bi bi-exclamation-triangle-fill text-danger me-2"></i>Low Stock Warnings</h6>
+        <span class="badge bg-danger">{{ low_stock_variants|length }} Sizes</span>
+      </div>
+
+      {% if low_stock_variants %}
+        <div class="d-flex flex-column gap-2 overflow-auto" style="max-height: 300px;">
+          {% for var in low_stock_variants %}
+            <div class="p-2 rounded bg-danger bg-opacity-10 border border-danger border-opacity-25 d-flex justify-content-between align-items-center">
+              <div>
+                <div class="fw-bold text-white small text-truncate" style="max-width: 170px;">{{ var.product.name }}</div>
+                <div class="text-white-50" style="font-size: 0.72rem;">Size: <strong>{{ var.size }}</strong> • SKU: {{ var.sku }}</div>
+              </div>
+              <div class="text-end">
+                <span class="stock-pill low">{{ var.stock_quantity }} left</span>
+                <a href="{{ url_for('admin.inventory') }}" class="d-block text-info small" style="font-size: 0.7rem;">Restock</a>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="text-center py-5 text-muted small">
+          <i class="bi bi-check2-circle fs-1 text-success d-block mb-2"></i>
+          All size variants are well-stocked (> 5 units).
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+</div>
+
+<!-- RECENT ORDERS & TOP SELLERS -->
+<div class="row g-4">
+  
+  <!-- Recent Orders Table -->
+  <div class="col-lg-8">
+    <div class="admin-table">
+      <div class="p-3 border-bottom border-secondary border-opacity-25 d-flex justify-content-between align-items-center">
+        <h6 class="fw-bold text-white mb-0"><i class="bi bi-receipt text-primary me-2"></i>Recent Orders</h6>
+        <a href="{{ url_for('admin.orders') }}" class="btn btn-sm btn-outline-secondary">View All Orders</a>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table mb-0">
+          <thead>
+            <tr>
+              <th>Order #</th>
+              <th>Customer</th>
+              <th>Total</th>
+              <th>Status</th>
+              <th>Date</th>
+              <th class="text-end">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for ord in recent_orders %}
+              <tr>
+                <td><strong class="font-monospace text-success">{{ ord.order_number }}</strong></td>
+                <td>{{ ord.shipping_name }}</td>
+                <td class="fw-bold text-white">₹{{ "%.2f"|format(ord.total_amount) }}</td>
+                <td>
+                  <span class="badge-status badge-{{ ord.status.lower() }}">{{ ord.status }}</span>
+                </td>
+                <td>
+                  <time class="text-white small fw-semibold text-nowrap" datetime="{{ ord.created_at.isoformat() if ord.created_at else '' }}">
+                    {{ ord.created_at.strftime('%b %d, %Y') if ord.created_at else 'Date unavailable' }}
+                  </time>
+                </td>
+                <td class="text-end">
+                  <a href="{{ url_for('admin.order_detail', order_id=ord.id) }}" class="btn btn-sm btn-outline-info py-0 px-2">
+                    Manage
+                  </a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Top Selling Jerseys -->
+  <div class="col-lg-4">
+    <div class="card bg-dark border-secondary border-opacity-25 rounded-3 p-4 h-100">
+      <h6 class="fw-bold text-white mb-3"><i class="bi bi-trophy-fill text-warning me-2"></i>Top Selling Jerseys</h6>
+
+      {% if top_selling %}
+        <div class="d-flex flex-column gap-3">
+          {% for ts in top_selling %}
+            <div class="d-flex align-items-center justify-content-between p-2 rounded bg-secondary bg-opacity-10 border border-secondary border-opacity-25">
+              <div class="d-flex align-items-center gap-2">
+                <span class="badge bg-warning text-dark fw-bold">#{{ loop.index }}</span>
+                <div>
+                  <div class="fw-bold text-white small text-truncate" style="max-width: 160px;">{{ ts.product_name }}</div>
+                  <div class="text-muted" style="font-size: 0.72rem;">{{ ts.units_sold }} units sold</div>
+                </div>
+              </div>
+              <div class="fw-bold text-success small">₹{{ "%.2f"|format(ts.total_revenue) }}</div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p class="text-muted small">No completed sales yet.</p>
+      {% endif %}
+    </div>
+  </div>
+
+</div>
+{% endblock %}

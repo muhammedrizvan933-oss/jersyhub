@@ -1,0 +1,168 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}{{ 'Edit Jersey: ' ~ product.name if product else 'Add New Jersey' }} | JerseyHub Admin{% endblock %}
+{% block page_title %}{{ 'Edit Jersey' if product else 'Add New Football Jersey' }}{% endblock %}
+
+{% block content %}
+<div class="card bg-dark border-secondary border-opacity-25 rounded-3 p-4">
+  <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom border-secondary border-opacity-25">
+    <h5 class="fw-bold text-white mb-0">
+      <i class="bi bi-tag-fill text-success me-2"></i>{{ 'Modify Jersey Details' if product else 'Enter Jersey Specifications' }}
+    </h5>
+    <a href="{{ url_for('admin.products') }}" class="btn btn-sm btn-outline-secondary">
+      <i class="bi bi-arrow-left me-1"></i> Back to Products
+    </a>
+  </div>
+
+  <form method="POST" enctype="multipart/form-data">
+    <div class="row g-4">
+      
+      <!-- Basic Information -->
+      <div class="col-lg-8">
+        <div class="row g-3">
+          
+          <div class="col-md-8">
+            <label class="form-label">Jersey Name *</label>
+            <input type="text" name="name" class="form-control" value="{{ product.name if product else '' }}" placeholder="Real Madrid 2024/25 Home Jersey" required>
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label">URL Slug (Optional)</label>
+            <input type="text" name="slug" class="form-control font-monospace" value="{{ product.slug if product else '' }}" placeholder="real-madrid-2024-25-home">
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Club / National Team *</label>
+            <select name="team_id" class="form-select" required>
+              <option value="">Select Team</option>
+              {% for t in teams %}
+                <option value="{{ t.id }}" {% if product and product.team_id == t.id %}selected{% endif %}>{{ t.name }} ({{ t.country }})</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">League / Kit Category</label>
+            <select name="category_id" class="form-select">
+              <option value="">Select Category</option>
+              {% for c in categories %}
+                <option value="{{ c.id }}" {% if product and product.category_id == c.id %}selected{% endif %}>{{ c.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">Jersey Description</label>
+            <textarea name="description" rows="4" class="form-control" placeholder="Detailed description of fabric technology, design heritage, badges...">{{ product.description if product else '' }}</textarea>
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label">Regular Price (₹) *</label>
+            <input type="number" step="0.01" name="price" class="form-control" value="{{ product.price if product else '90.00' }}" required>
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label">Discount Sale Price (₹)</label>
+            <input type="number" step="0.01" name="discount_price" class="form-control" value="{{ product.discount_price if product and product.discount_price else '' }}" placeholder="Leave blank if full price">
+          </div>
+
+          <div class="col-md-4">
+            <label class="form-label">Season</label>
+            <input type="text" name="season" class="form-control" value="{{ product.season if product else '2024/25' }}" placeholder="2024/25">
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Kit Type</label>
+            <select name="kit_type" class="form-select">
+              <option value="Home" {% if product and product.kit_type == 'Home' %}selected{% endif %}>Home Kit</option>
+              <option value="Away" {% if product and product.kit_type == 'Away' %}selected{% endif %}>Away Kit</option>
+              <option value="Third" {% if product and product.kit_type == 'Third' %}selected{% endif %}>Third Kit</option>
+              <option value="Retro" {% if product and product.kit_type == 'Retro' %}selected{% endif %}>Retro Throwback</option>
+              <option value="Special Edition" {% if product and product.kit_type == 'Special Edition' %}selected{% endif %}>Special Edition</option>
+            </select>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Gender / Department</label>
+            <select name="gender" class="form-select">
+              <option value="Men" {% if product and product.gender == 'Men' %}selected{% endif %}>Men</option>
+              <option value="Women" {% if product and product.gender == 'Women' %}selected{% endif %}>Women</option>
+              <option value="Kids" {% if product and product.gender == 'Kids' %}selected{% endif %}>Kids</option>
+              <option value="Unisex" {% if product and product.gender == 'Unisex' %}selected{% endif %}>Unisex</option>
+            </select>
+          </div>
+
+          <!-- Product Badges / Highlights -->
+          <div class="col-12 mt-3">
+            <label class="form-label fw-bold d-block text-white mb-2">Display Badges</label>
+            <div class="d-flex gap-4">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="is_featured" id="feat" {% if product and product.is_featured %}checked{% endif %}>
+                <label class="form-check-label text-white small" for="feat">Featured Collection</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="is_bestseller" id="best" {% if product and product.is_bestseller %}checked{% endif %}>
+                <label class="form-check-label text-white small" for="best">Best Seller</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="is_new_arrival" id="newarr" {% if product and product.is_new_arrival %}checked{% endif %}>
+                <label class="form-check-label text-white small" for="newarr">New Arrival</label>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- RIGHT: IMAGES & SIZE INVENTORY -->
+      <div class="col-lg-4">
+        
+        <!-- Product Images -->
+        <div class="p-3 rounded-3 bg-secondary bg-opacity-10 border border-secondary border-opacity-25 mb-4">
+          <h6 class="fw-bold text-white mb-3"><i class="bi bi-image me-1"></i> Product Imagery</h6>
+          
+          <div class="mb-3">
+            <label class="form-label small">Primary Jersey Image</label>
+            <input type="file" name="primary_image_file" class="form-control form-control-sm mb-2" accept="image/png,image/jpeg,image/webp,image/gif" onchange="if(this.files[0]) document.getElementById('previewPrimary').src=URL.createObjectURL(this.files[0])">
+            <label class="form-label small text-muted">Or use an image URL</label>
+            <input type="url" name="primary_image" id="primaryImgInput" class="form-control form-control-sm" value="{{ product.primary_image if product else 'https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=800&auto=format&fit=crop&q=80' }}" oninput="if(this.value) document.getElementById('previewPrimary').src=this.value">
+            <div class="mt-2 text-center">
+              <img id="previewPrimary" src="{{ product.primary_image if product else 'https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=800&auto=format&fit=crop&q=80' }}" alt="Primary jersey preview" class="rounded shadow-sm" style="max-height: 120px; object-fit: cover;">
+            </div>
+          </div>
+
+          <div class="mb-2">
+            <label class="form-label small">Secondary Image (Back / Detail)</label>
+            <input type="file" name="secondary_image_file" class="form-control form-control-sm mb-2" accept="image/png,image/jpeg,image/webp,image/gif">
+            <input type="url" name="secondary_image" class="form-control form-control-sm" value="{{ product.secondary_image if product and product.secondary_image else '' }}" placeholder="Or paste an image URL">
+          </div>
+        </div>
+
+        <!-- Initial Stock per Size Variant -->
+        <div class="p-3 rounded-3 bg-secondary bg-opacity-10 border border-secondary border-opacity-25">
+          <h6 class="fw-bold text-white mb-3"><i class="bi bi-boxes me-1"></i> Stock by Size Variant</h6>
+          
+          {% for s in ['S', 'M', 'L', 'XL', 'XXL'] %}
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <span class="badge bg-secondary">Size {{ s }}</span>
+              <div class="input-group input-group-sm" style="width: 120px;">
+                <input type="number" min="0" name="stock_{{ s }}" class="form-control text-center" value="{{ variants_by_size[s] if variants_by_size and s in variants_by_size else 15 }}">
+                <span class="input-group-text bg-dark text-muted">units</span>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+
+      </div>
+
+      <div class="col-12 mt-4 pt-3 border-top border-secondary border-opacity-25">
+        <button type="submit" class="btn btn-success px-4 py-2 fw-bold">
+          <i class="bi bi-check-lg me-1"></i> {{ 'Save Changes' if product else 'Publish Jersey to Store' }}
+        </button>
+        <a href="{{ url_for('admin.products') }}" class="btn btn-outline-secondary px-4 py-2 ms-2">Cancel</a>
+      </div>
+
+    </div>
+  </form>
+</div>
+{% endblock %}

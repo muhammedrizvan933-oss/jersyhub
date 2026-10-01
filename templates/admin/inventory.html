@@ -1,0 +1,92 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}Inventory & Stock | JerseyHub Admin{% endblock %}
+{% block page_title %}Inventory & Size Stock Management{% endblock %}
+
+{% block content %}
+<div class="card bg-dark border-secondary border-opacity-25 rounded-3 p-4 mb-4">
+  <div class="d-flex justify-content-between align-items-center">
+    <div>
+      <h6 class="fw-bold text-white mb-1"><i class="bi bi-boxes text-success me-2"></i>Real-time Stock Control</h6>
+      <span class="text-muted small">Update variant stock quantities instantly with real-time database updates.</span>
+    </div>
+    <div>
+      {% if low_only %}
+        <a href="{{ url_for('admin.inventory') }}" class="btn btn-sm btn-outline-secondary">Show All Products</a>
+      {% else %}
+        <a href="{{ url_for('admin.inventory', low_only=1) }}" class="btn btn-sm btn-outline-warning">
+          <i class="bi bi-filter me-1"></i> Filter Low Stock Only (&le; 5)
+        </a>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<div class="admin-table">
+  <div class="table-responsive">
+    <table class="table mb-0 align-middle">
+      <thead>
+        <tr>
+          <th>Jersey Name</th>
+          <th>Size S</th>
+          <th>Size M</th>
+          <th>Size L</th>
+          <th>Size XL</th>
+          <th>Size XXL</th>
+          <th>Total Stock</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in products %}
+          {% set vars_map = {} %}
+          {% for v in p.variants %}
+            {% set _ = vars_map.update({v.size: v}) %}
+          {% endfor %}
+
+          <tr>
+            <td>
+              <div class="d-flex align-items-center gap-2">
+                <img src="{{ p.primary_image }}" alt="{{ p.name }}" class="rounded" style="width: 38px; height: 38px; object-fit: cover;">
+                <div>
+                  <div class="fw-bold text-white small text-truncate" style="max-width: 220px;">{{ p.name }}</div>
+                  <div class="text-muted" style="font-size: 0.72rem;">{{ p.team.name }}</div>
+                </div>
+              </div>
+            </td>
+
+            <!-- Variants S, M, L, XL, XXL -->
+            {% for s in ['S', 'M', 'L', 'XL', 'XXL'] %}
+              <td>
+                {% if s in vars_map %}
+                  {% set variant = vars_map[s] %}
+                  <form action="{{ url_for('admin.inventory') }}" method="POST" class="inventory-stock-form d-flex align-items-center gap-1" style="max-width: 110px;">
+                    <input type="hidden" name="variant_id" value="{{ variant.id }}">
+                    <input 
+                      type="number" 
+                      min="0" 
+                      name="stock_quantity" 
+                      value="{{ variant.stock_quantity }}" 
+                      class="form-control form-control-sm text-center p-1 {% if variant.stock_quantity <= 5 %}border-danger text-danger fw-bold{% else %}border-secondary text-white{% endif %}"
+                    >
+                    <button type="submit" class="btn btn-sm btn-outline-primary p-1" title="Save Stock">
+                      <i class="bi bi-save"></i>
+                    </button>
+                  </form>
+                {% else %}
+                  <span class="text-muted small">-</span>
+                {% endif %}
+              </td>
+            {% endfor %}
+
+            <td>
+              <span class="badge {% if p.total_stock > 10 %}bg-success{% elif p.total_stock > 0 %}bg-warning text-dark{% else %}bg-danger{% endif %} px-2 py-1">
+                {{ p.total_stock }} Total
+              </span>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

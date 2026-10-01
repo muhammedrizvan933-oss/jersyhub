@@ -1,0 +1,688 @@
+/* ========================================================
+   JerseyHub - Modern Football Jersey E-Commerce Styles
+   ======================================================== */
+
+:root {
+  --jh-primary: #0a0f1d;
+  --jh-secondary: #111827;
+  --jh-card-bg: #1f2937;
+  --jh-accent: #00e676; /* Pitch Neon Green */
+  --jh-accent-hover: #00c853;
+  --jh-gold: #f59e0b;
+  --jh-danger: #ef4444;
+  --jh-blue: #3b82f6;
+  --jh-text-main: #f9fafb;
+  --jh-text-muted: #9ca3af;
+  --jh-border: #374151;
+  --jh-font: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --jh-radius: 12px;
+}
+
+body {
+  font-family: var(--jh-font);
+  background-color: #0b0f19;
+  color: var(--jh-text-main);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex: 1 0 auto;
+}
+
+/* --- NAVBAR --- */
+.navbar-jh {
+  background-color: rgba(11, 15, 25, 0.95);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 0.85rem 0;
+  transition: all 0.3s ease;
+}
+
+.brand-logo {
+  font-size: 1.55rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: #fff !important;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.brand-badge {
+  background: linear-gradient(135deg, #00e676, #00b0ff);
+  color: #000;
+  font-size: 0.75rem;
+  font-weight: 900;
+  padding: 0.15rem 0.45rem;
+  border-radius: 6px;
+  text-transform: uppercase;
+}
+
+.nav-link {
+  color: #d1d5db !important;
+  font-weight: 500;
+  font-size: 0.95rem;
+  padding: 0.5rem 0.85rem !important;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.nav-link:hover, .nav-link.active {
+  color: var(--jh-accent) !important;
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.search-bar-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 320px;
+}
+
+.search-input {
+  background-color: #1a2233 !important;
+  border: 1px solid var(--jh-border) !important;
+  color: #fff !important;
+  border-radius: 30px !important;
+  padding-left: 2.4rem !important;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.search-input::placeholder {
+  color: #c5d0db;
+  opacity: 1;
+}
+
+.search-input:focus {
+  border-color: var(--jh-accent) !important;
+  box-shadow: 0 0 0 3px rgba(0, 230, 118, 0.2) !important;
+}
+
+.search-icon-pos {
+  position: absolute;
+  left: 0.85rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--jh-text-muted);
+  pointer-events: none;
+}
+
+/* Autocomplete live search dropdown */
+.search-results-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #161f30;
+  border: 1px solid var(--jh-border);
+  border-radius: 12px;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+  margin-top: 6px;
+  z-index: 1050;
+  display: none;
+  max-height: 380px;
+  overflow-y: auto;
+}
+
+.search-result-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  text-decoration: none;
+  color: #fff;
+  transition: background 0.2s;
+}
+
+.search-result-item:hover {
+  background: #1e293b;
+}
+
+.search-result-thumb {
+  width: 42px;
+  height: 42px;
+  object-fit: cover;
+  border-radius: 8px;
+  background: #242f47;
+}
+
+/* Cart badge counter */
+.cart-btn-wrap {
+  position: relative;
+}
+
+.cart-counter-badge {
+  position: absolute;
+  top: -6px;
+  right: -8px;
+  background: var(--jh-accent);
+  color: #0b0f19;
+  font-weight: 800;
+  font-size: 0.72rem;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* --- HERO BANNER --- */
+.hero-section {
+  position: relative;
+  background: linear-gradient(135deg, rgba(10, 15, 29, 0.92) 0%, rgba(17, 24, 39, 0.95) 100%),
+              url('https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=1600&auto=format&fit=crop&q=80') center/cover no-repeat;
+  padding: 5.5rem 0 4.5rem;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  overflow: hidden;
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(0, 230, 118, 0.12);
+  border: 1px solid rgba(0, 230, 118, 0.3);
+  color: var(--jh-accent);
+  padding: 0.35rem 0.9rem;
+  border-radius: 30px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 1.2rem;
+}
+
+.hero-title {
+  font-size: 3.5rem;
+  font-weight: 900;
+  line-height: 1.1;
+  letter-spacing: -1px;
+}
+
+.hero-subtitle {
+  font-size: 1.15rem;
+  color: #94a3b8;
+  max-width: 560px;
+}
+
+.hero-stats {
+  display: flex;
+  gap: 2rem;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+.hero-stat-val {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+.hero-stat-lbl {
+  font-size: 0.8rem;
+  color: var(--jh-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* --- BUTTONS --- */
+.btn-jh-primary {
+  background: var(--jh-accent);
+  color: #0b0f19;
+  font-weight: 700;
+  border: none;
+  border-radius: 10px;
+  padding: 0.65rem 1.4rem;
+  transition: all 0.25s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-jh-primary:hover {
+  background: var(--jh-accent-hover);
+  color: #000;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 230, 118, 0.3);
+}
+
+.btn-jh-outline {
+  background: transparent;
+  color: #fff;
+  border: 1px solid var(--jh-border);
+  font-weight: 600;
+  border-radius: 10px;
+  padding: 0.65rem 1.4rem;
+  transition: all 0.25s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-jh-outline:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: #fff;
+  color: #fff;
+}
+
+/* --- SECTION HEADERS --- */
+.section-header {
+  margin-bottom: 2.2rem;
+}
+
+.section-tag {
+  color: var(--jh-accent);
+  font-weight: 800;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.section-title {
+  font-size: 2.1rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+/* --- JERSEY PRODUCT CARDS --- */
+.product-card {
+  background: #141b2b;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--jh-radius);
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  position: relative;
+}
+
+.product-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(0, 230, 118, 0.4);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.45);
+}
+
+.product-img-wrap {
+  position: relative;
+  width: 100%;
+  padding-top: 105%;
+  background: #0f1522;
+  overflow: hidden;
+}
+
+.product-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.product-card:hover .product-img {
+  transform: scale(1.06);
+}
+
+.product-badge-group {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  z-index: 2;
+}
+
+.p-badge {
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 3px 8px;
+  border-radius: 5px;
+}
+
+.p-badge-sale {
+  background: #ef4444;
+  color: #fff;
+}
+
+.p-badge-bestseller {
+  background: var(--jh-gold);
+  color: #000;
+}
+
+.p-badge-new {
+  background: var(--jh-accent);
+  color: #000;
+}
+
+.product-body {
+  padding: 1.15rem;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.product-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.8rem;
+  color: var(--jh-text-muted);
+  margin-bottom: 0.4rem;
+}
+
+.product-team {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-width: 0;
+}
+
+.product-team-logo {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  flex: 0 0 auto;
+}
+
+.product-detail-team-logo {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  background: var(--jh-card-bg);
+  border-radius: 50%;
+  padding: 2px;
+}
+
+.product-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.35;
+  color: #fff;
+  text-decoration: none;
+  margin-bottom: 0.6rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.product-name:hover {
+  color: var(--jh-accent);
+}
+
+.product-rating {
+  font-size: 0.82rem;
+  color: var(--jh-gold);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 0.75rem;
+}
+
+.product-price-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 0.5rem;
+}
+
+.current-price {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+.original-price {
+  font-size: 0.95rem;
+  color: var(--jh-text-muted);
+  text-decoration: line-through;
+}
+
+.discount-tag {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #10b981;
+}
+
+/* Quick add button on cards */
+.card-quick-add {
+  margin-top: 0.85rem;
+  width: 100%;
+  border-radius: 8px;
+  padding: 0.5rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+/* --- CATEGORY CIRCLE CARDS --- */
+.category-circle-card {
+  text-align: center;
+  text-decoration: none;
+  display: block;
+  transition: transform 0.25s ease;
+}
+
+.category-circle-card:hover {
+  transform: translateY(-5px);
+}
+
+.category-circle-img-wrap {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  margin: 0 auto 0.75rem;
+  padding: 4px;
+  background: linear-gradient(135deg, rgba(0, 230, 118, 0.4), rgba(59, 130, 246, 0.4));
+  overflow: hidden;
+  transition: all 0.3s;
+}
+
+.category-circle-card:hover .category-circle-img-wrap {
+  background: linear-gradient(135deg, var(--jh-accent), #3b82f6);
+  box-shadow: 0 0 20px rgba(0, 230, 118, 0.4);
+}
+
+.category-circle-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #1f2937;
+}
+
+.team-crest-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 50%;
+  background: var(--jh-card-bg);
+  padding: 12px;
+}
+
+.team-crest-fallback[hidden] {
+  display: none !important;
+}
+
+.category-circle-title {
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+/* --- WHY CHOOSE JERSEYHUB --- */
+.feature-box {
+  background: #141b2b;
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--jh-radius);
+  padding: 1.75rem;
+  text-align: center;
+  height: 100%;
+  transition: transform 0.25s ease;
+}
+
+.feature-box:hover {
+  transform: translateY(-4px);
+  border-color: rgba(0, 230, 118, 0.3);
+}
+
+.feature-icon-wrap {
+  width: 58px;
+  height: 58px;
+  border-radius: 14px;
+  background: rgba(0, 230, 118, 0.12);
+  color: var(--jh-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  margin: 0 auto 1.1rem;
+}
+
+.feature-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.feature-desc {
+  font-size: 0.88rem;
+  color: var(--jh-text-muted);
+  line-height: 1.5;
+  margin-bottom: 0;
+}
+
+/* --- SPECIAL OFFER BANNER --- */
+.offer-banner {
+  background: linear-gradient(90deg, #1e1b4b 0%, #0f172a 100%);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  border-radius: 16px;
+  padding: 3rem 2.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+/* --- FORMS & INPUTS --- */
+.form-control, .form-select {
+  background-color: #161f30 !important;
+  border: 1px solid var(--jh-border) !important;
+  color: #fff !important;
+  border-radius: 8px;
+  padding: 0.65rem 0.9rem;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: var(--jh-accent) !important;
+  box-shadow: 0 0 0 3px rgba(0, 230, 118, 0.2) !important;
+}
+
+.form-label {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #cbd5e1;
+  margin-bottom: 0.35rem;
+}
+
+/* --- FOOTER --- */
+.footer-jh {
+  background: #080b12;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 4rem 0 2rem;
+  margin-top: 4.5rem;
+  color: #94a3b8;
+  font-size: 0.9rem;
+}
+
+.footer-jh .text-muted {
+  color: #c5d0db !important;
+}
+
+.footer-jh a {
+  color: #94a3b8;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.footer-jh a:hover {
+  color: var(--jh-accent);
+}
+
+.footer-bottom {
+  border-top: 1px solid rgba(255,255,255,0.06);
+  padding-top: 1.8rem;
+  margin-top: 3rem;
+  font-size: 0.82rem;
+}
+
+/* --- PRODUCT DETAIL PAGE --- */
+.size-picker-btn {
+  background: #1a2233;
+  color: #fff;
+  border: 1px solid var(--jh-border);
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.size-picker-btn:hover {
+  border-color: var(--jh-accent);
+}
+
+.size-picker-btn.active {
+  background: var(--jh-accent);
+  color: #0b0f19;
+  border-color: var(--jh-accent);
+  box-shadow: 0 0 12px rgba(0,230,118,0.4);
+}
+
+.size-picker-btn.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  text-decoration: line-through;
+}
+
+/* Order timeline */
+.track-step {
+  position: relative;
+  text-align: center;
+  flex: 1;
+}
+
+.track-step-circle {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #1f2937;
+  border: 2px solid var(--jh-border);
+  color: #9ca3af;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 8px;
+  font-weight: 700;
+}
+
+.track-step.completed .track-step-circle {
+  background: var(--jh-accent);
+  border-color: var(--jh-accent);
+  color: #0b0f19;
+}
+
+.track-step.active .track-step-circle {
+  background: #3b82f6;
+  border-color: #3b82f6;
+  color: #fff;
+  box-shadow: 0 0 12px rgba(59, 130, 246, 0.5);
+}

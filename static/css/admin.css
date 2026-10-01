@@ -1,0 +1,248 @@
+/* ========================================================
+   JerseyHub - Admin Dashboard Styling
+   ======================================================== */
+
+:root {
+  --admin-sidebar-w: 260px;
+  --admin-bg: #090d16;
+  --admin-card: #131a29;
+  --admin-border: #232d42;
+  --admin-accent: #00e676;
+}
+
+body.admin-body {
+  background-color: var(--admin-bg);
+  color: #e2e8f0;
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  overflow-x: hidden;
+}
+
+.admin-body .text-muted {
+  color: #b3c0cd !important;
+}
+
+.admin-body .text-white-50 {
+  color: #c5d0db !important;
+}
+
+.admin-body .text-dark {
+  color: #e2e8f0 !important;
+}
+
+.admin-body .bg-warning.text-dark,
+.admin-body .btn-warning.text-dark {
+  background-color: #493713 !important;
+  border-color: #76591f !important;
+  color: #fcd978 !important;
+}
+
+.admin-body .bg-info.text-dark,
+.admin-body .btn-info.text-dark {
+  background-color: #123347 !important;
+  border-color: #1b5974 !important;
+  color: #a8e3fa !important;
+}
+
+.admin-body .bg-success.text-dark {
+  background-color: #123c2b !important;
+  border-color: #1c6847 !important;
+  color: #9be8be !important;
+}
+
+.admin-customer-phone {
+  color: var(--admin-accent);
+  font-weight: 700;
+}
+
+/* Sidebar */
+.admin-sidebar {
+  width: var(--admin-sidebar-w);
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-color: #0d1322;
+  border-right: 1px solid var(--admin-border);
+  padding: 1.5rem 1rem;
+  display: flex;
+  flex-direction: column;
+  z-index: 1000;
+  overflow-y: auto;
+}
+
+.admin-brand {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #fff;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 0.5rem 1.5rem;
+  border-bottom: 1px solid var(--admin-border);
+  margin-bottom: 1.5rem;
+}
+
+.admin-nav {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.admin-nav-item a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0.65rem 0.9rem;
+  border-radius: 8px;
+  color: #94a3b8;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.admin-nav-item a:hover, .admin-nav-item a.active {
+  background-color: rgba(0, 230, 118, 0.12);
+  color: var(--admin-accent);
+}
+
+.admin-nav-section-title {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  color: #64748b;
+  font-weight: 700;
+  letter-spacing: 1px;
+  padding: 1rem 0.9rem 0.4rem;
+}
+
+/* Main Content Area */
+.admin-main {
+  margin-left: var(--admin-sidebar-w);
+  padding: 2rem;
+  min-height: 100vh;
+}
+
+/* Topbar */
+.admin-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--admin-border);
+}
+
+/* Stat Cards */
+.admin-stat-card {
+  background: var(--admin-card);
+  border: 1px solid var(--admin-border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.admin-stat-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--admin-accent), #3b82f6);
+}
+
+.stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+}
+
+.stat-val {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #fff;
+  margin-top: 0.5rem;
+}
+
+.stat-title {
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  color: #94a3b8;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+/* Tables */
+.admin-table {
+  background: #1a2535;
+  border: 1px solid var(--admin-border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.admin-table table {
+  margin-bottom: 0;
+  color: #e2e8f0;
+  --bs-table-color: #e2e8f0;
+  --bs-table-bg: #1a2535;
+}
+
+.admin-table th {
+  background: #0f1523;
+  color: #94a3b8;
+  font-weight: 700;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 1rem;
+  border-bottom: 1px solid var(--admin-border);
+}
+
+.admin-table td {
+  padding: 1rem;
+  vertical-align: middle;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  font-size: 0.9rem;
+}
+
+.admin-table tr:hover td {
+  background-color: rgba(255,255,255,0.02);
+}
+
+.inventory-stock-form .form-control {
+  background-color: #101827;
+  border-color: #425066;
+}
+
+/* Status Badges */
+.badge-status {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.badge-pending { background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3); }
+.badge-processing { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); }
+.badge-shipped { background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.3); }
+.badge-delivered { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+.badge-cancelled { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+
+/* Quick stock pill */
+.stock-pill {
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+.stock-pill.low { background: #ef4444; color: #fff; }
+.stock-pill.good { background: #123c2b; color: #9be8be; border: 1px solid #1c6847; }

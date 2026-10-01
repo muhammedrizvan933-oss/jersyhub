@@ -1,0 +1,233 @@
+{% extends 'base.html' %}
+
+{% block title %}Shop Football Jerseys | JerseyHub{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  
+  <!-- Breadcrumb & Header -->
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb small text-muted">
+      <li class="breadcrumb-item"><a href="{{ url_for('main.home') }}" class="text-muted">Home</a></li>
+      <li class="breadcrumb-item active text-white" aria-current="page">Jerseys</li>
+      {% if selected_category %}
+        <li class="breadcrumb-item active text-success">{{ selected_category.name }}</li>
+      {% endif %}
+      {% if selected_team %}
+        <li class="breadcrumb-item active text-info">{{ selected_team.name }}</li>
+      {% endif %}
+    </ol>
+  </nav>
+
+  <div class="row g-4">
+    
+    <!-- SIDEBAR FILTERS -->
+    <div class="col-lg-3">
+      <div class="card bg-dark border-secondary border-opacity-25 rounded-3 p-3 sticky-top" style="top: 80px; z-index: 10;">
+        <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom border-secondary border-opacity-25">
+          <h5 class="fw-bold mb-0 text-white"><i class="bi bi-funnel-fill text-success me-2"></i>Filters</h5>
+          <a href="{{ url_for('products.list_products') }}" class="btn btn-sm btn-link text-white-50 text-decoration-none p-0">Clear All</a>
+        </div>
+
+        <form action="{{ url_for('products.list_products') }}" method="GET" id="filterForm">
+          
+          <!-- Preserved Sort -->
+          <input type="hidden" name="sort" value="{{ sort_by }}">
+
+          <!-- Keyword Search -->
+          <div class="mb-3">
+            <label class="form-label small text-muted text-uppercase fw-bold">Search</label>
+            <div class="input-group">
+              <input type="text" name="q" value="{{ search_query }}" class="form-control form-control-sm" placeholder="Search keywords...">
+              <button class="btn btn-sm btn-secondary" type="submit"><i class="bi bi-search"></i></button>
+            </div>
+          </div>
+
+          <!-- Category / League -->
+          <div class="mb-3">
+            <label class="form-label small text-muted text-uppercase fw-bold">League / Category</label>
+            <select name="category" class="form-select form-select-sm" onchange="this.form.submit()">
+              <option value="">All Leagues</option>
+              {% for cat in categories %}
+                <option value="{{ cat.slug }}" {% if category_slug == cat.slug %}selected{% endif %}>{{ cat.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Team -->
+          <div class="mb-3">
+            <label class="form-label small text-muted text-uppercase fw-bold">Club / Team</label>
+            <select name="team" class="form-select form-select-sm" onchange="this.form.submit()">
+              <option value="">All Teams</option>
+              {% for t in teams %}
+                <option value="{{ t.slug }}" {% if team_slug == t.slug %}selected{% endif %}>{{ t.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Kit Type -->
+          <div class="mb-3">
+            <label class="form-label small text-muted text-uppercase fw-bold">Kit Type</label>
+            <select name="kit_type" class="form-select form-select-sm" onchange="this.form.submit()">
+              <option value="">All Kit Types</option>
+              {% for kt in available_kit_types %}
+                <option value="{{ kt }}" {% if kit_type == kt %}selected{% endif %}>{{ kt }} Kit</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Size Filter -->
+          <div class="mb-3">
+            <label class="form-label small text-muted text-uppercase fw-bold">Size</label>
+            <div class="d-flex flex-wrap gap-2">
+              {% for s in available_sizes %}
+                <label class="btn btn-sm btn-outline-secondary py-1 px-2 {% if size == s %}active bg-success text-dark fw-bold border-success{% endif %}" style="cursor: pointer;">
+                  <input type="radio" name="size" value="{{ s }}" class="d-none" onchange="this.form.submit()" {% if size == s %}checked{% endif %}>
+                  {{ s }}
+                </label>
+              {% endfor %}
+              {% if size %}
+                <a href="{{ url_for('products.list_products', q=search_query, category=category_slug, team=team_slug, kit_type=kit_type, sort=sort_by) }}" class="btn btn-sm btn-link text-danger p-0 align-self-center small ms-1">Reset Size</a>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- Price Range -->
+          <div class="mb-3">
+            <label class="form-label small text-muted text-uppercase fw-bold">Price Range (₹)</label>
+            <div class="row g-2">
+              <div class="col-6">
+                <input type="number" step="500" name="min_price" value="{{ min_price if min_price is not none else '' }}" placeholder="Min" class="form-control form-control-sm">
+              </div>
+              <div class="col-6">
+                <input type="number" step="500" name="max_price" value="{{ max_price if max_price is not none else '' }}" placeholder="Max" class="form-control form-control-sm">
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-sm btn-jh-primary w-100 mt-2">
+            <i class="bi bi-filter"></i> Apply Filters
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- MAIN PRODUCT GRID -->
+    <div class="col-lg-9">
+      
+      <!-- Top Sort Bar -->
+      <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 p-3 bg-dark rounded-3 border border-secondary border-opacity-25">
+        <div class="text-white-50 small mb-2 mb-sm-0">
+          Showing <strong class="text-white">{{ products|length }}</strong> jerseys
+          {% if search_query %} for "<strong class="text-success">{{ search_query }}</strong>"{% endif %}
+        </div>
+
+        <div class="d-flex align-items-center gap-2">
+          <label class="small text-white-50 text-nowrap">Sort By:</label>
+          <select class="form-select form-select-sm" style="width: auto;" onchange="location = this.value;">
+            <option value="{{ url_for('products.list_products', page=1, q=search_query, category=category_slug, team=team_slug, kit_type=kit_type, size=size, min_price=min_price, max_price=max_price, sort='featured') }}" {% if sort_by == 'featured' %}selected{% endif %}>Featured</option>
+            <option value="{{ url_for('products.list_products', page=1, q=search_query, category=category_slug, team=team_slug, kit_type=kit_type, size=size, min_price=min_price, max_price=max_price, sort='popular') }}" {% if sort_by == 'popular' %}selected{% endif %}>Best Selling</option>
+            <option value="{{ url_for('products.list_products', page=1, q=search_query, category=category_slug, team=team_slug, kit_type=kit_type, size=size, min_price=min_price, max_price=max_price, sort='newest') }}" {% if sort_by == 'newest' %}selected{% endif %}>Newest</option>
+            <option value="{{ url_for('products.list_products', page=1, q=search_query, category=category_slug, team=team_slug, kit_type=kit_type, size=size, min_price=min_price, max_price=max_price, sort='price_asc') }}" {% if sort_by == 'price_asc' %}selected{% endif %}>Price: Low to High</option>
+            <option value="{{ url_for('products.list_products', page=1, q=search_query, category=category_slug, team=team_slug, kit_type=kit_type, size=size, min_price=min_price, max_price=max_price, sort='price_desc') }}" {% if sort_by == 'price_desc' %}selected{% endif %}>Price: High to Low</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Products Grid -->
+      {% if products %}
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
+          {% for product in products %}
+            <div class="col">
+              <div class="product-card">
+                <div class="product-img-wrap">
+                  <a href="{{ url_for('products.detail', slug=product.slug) }}">
+                    <img src="{{ product.primary_image }}" alt="{{ product.name }}" class="product-img" loading="lazy">
+                  </a>
+                  <div class="product-badge-group">
+                    {% if product.has_discount %}
+                      <span class="p-badge p-badge-sale">-{{ product.discount_percent }}% OFF</span>
+                    {% endif %}
+                    {% if product.is_bestseller %}
+                      <span class="p-badge p-badge-bestseller">Hot</span>
+                    {% endif %}
+                    {% if product.is_new_arrival %}
+                      <span class="p-badge p-badge-new">New</span>
+                    {% endif %}
+                  </div>
+                </div>
+
+                <div class="product-body">
+                  <div class="product-meta">
+                    <span class="product-team">
+                      {% if product.team.logo_url %}
+                        <img src="{{ product.team.logo_url }}" alt="" class="product-team-logo" loading="lazy" onerror="this.hidden=true;">
+                      {% endif %}
+                      {{ product.team.name }}
+                    </span>
+                    <span>{{ product.season }}</span>
+                  </div>
+                  <a href="{{ url_for('products.detail', slug=product.slug) }}" class="product-name">
+                    {{ product.name }}
+                  </a>
+                  <div class="product-rating">
+                    <i class="bi bi-star-fill"></i>
+                    <span class="fw-bold">{{ product.average_rating }}</span>
+                    <span class="text-muted">({{ product.review_count }})</span>
+                  </div>
+
+                  <div class="product-price-row">
+                    <span class="current-price">₹{{ "%.2f"|format(product.effective_price) }}</span>
+                    {% if product.has_discount %}
+                      <span class="original-price">₹{{ "%.2f"|format(product.price) }}</span>
+                    {% endif %}
+                  </div>
+
+                  <a href="{{ url_for('products.detail', slug=product.slug) }}" class="btn btn-jh-outline card-quick-add">
+                    Select Size & Buy
+                  </a>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        {% if pagination.pages > 1 %}
+          <nav class="mt-5" aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+              <li class="page-item {% if not pagination.has_prev %}disabled{% endif %}">
+                <a class="page-link bg-dark text-white border-secondary" href="{{ url_for('products.list_products', page=pagination.prev_num, q=search_query, category=category_slug, team=team_slug, kit_type=kit_type, size=size, min_price=min_price, max_price=max_price, sort=sort_by) }}">Previous</a>
+              </li>
+              {% for p in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+                {% if p %}
+                  <li class="page-item {% if p == pagination.page %}active{% endif %}">
+                    <a class="page-link {% if p == pagination.page %}bg-success text-dark border-success fw-bold{% else %}bg-dark text-white border-secondary{% endif %}" href="{{ url_for('products.list_products', page=p, q=search_query, category=category_slug, team=team_slug, kit_type=kit_type, size=size, min_price=min_price, max_price=max_price, sort=sort_by) }}">{{ p }}</a>
+                  </li>
+                {% else %}
+                  <li class="page-item disabled"><span class="page-link bg-dark text-white-50 border-secondary">…</span></li>
+                {% endif %}
+              {% endfor %}
+              <li class="page-item {% if not pagination.has_next %}disabled{% endif %}">
+                <a class="page-link bg-dark text-white border-secondary" href="{{ url_for('products.list_products', page=pagination.next_num, q=search_query, category=category_slug, team=team_slug, kit_type=kit_type, size=size, min_price=min_price, max_price=max_price, sort=sort_by) }}">Next</a>
+              </li>
+            </ul>
+          </nav>
+        {% endif %}
+
+      {% else %}
+        <div class="text-center py-5 bg-dark rounded-3 border border-secondary border-opacity-25 p-5">
+          <i class="bi bi-search display-1 text-muted mb-3"></i>
+          <h4>No football jerseys match your current filters</h4>
+          <p class="text-muted">Try clearing some filters or searching with a different term.</p>
+          <a href="{{ url_for('products.list_products') }}" class="btn btn-jh-primary mt-2">
+            Reset All Filters
+          </a>
+        </div>
+      {% endif %}
+
+    </div>
+
+  </div>
+</div>
+{% endblock %}

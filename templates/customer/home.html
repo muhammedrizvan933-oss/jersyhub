@@ -1,0 +1,395 @@
+{% extends 'base.html' %}
+
+{% block title %}JerseyHub | Authentic Club & National Football Jerseys{% endblock %}
+
+{% block content %}
+<!-- HERO BANNER -->
+<section class="hero-section text-white">
+  <div class="container position-relative">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-7">
+        <div class="hero-badge">
+          <i class="bi bi-patch-check-fill"></i> Official 2024/25 Match & Stadium Kits
+        </div>
+        <h1 class="hero-title mb-3">
+          WEAR YOUR PASSION.<br>
+          <span style="color: #00e676;">RULE THE PITCH.</span>
+        </h1>
+        <p class="hero-subtitle mb-4">
+          Discover the world's most comprehensive collection of official club jerseys, national team kits, and timeless retro classics. Worn by legends, delivered directly to your doorstep.
+        </p>
+        
+        <div class="d-flex flex-wrap gap-3">
+          <a href="{{ url_for('products.list_products') }}" class="btn btn-jh-primary btn-lg fs-6 px-4">
+            <i class="bi bi-grid-fill"></i> Explore All Jerseys
+          </a>
+          <a href="{{ url_for('products.list_products', category='national-teams') }}" class="btn btn-jh-outline btn-lg fs-6 px-4">
+            <i class="bi bi-globe2"></i> National Teams
+          </a>
+        </div>
+
+        <div class="hero-stats">
+          <div>
+            <div class="hero-stat-val text-success">100%</div>
+            <div class="hero-stat-lbl">Authentic Guarantee</div>
+          </div>
+          <div>
+            <div class="hero-stat-val text-warning">20+</div>
+            <div class="hero-stat-lbl">Top Clubs & Countries</div>
+          </div>
+          <div>
+            <div class="hero-stat-val text-info">2-4 Days</div>
+            <div class="hero-stat-lbl">Fast Delivery</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-5 d-none d-lg-block text-center position-relative">
+        <div style="background: radial-gradient(circle, rgba(0,230,118,0.2) 0%, rgba(10,15,29,0) 70%); border-radius: 50%; padding: 2rem;">
+          <img 
+            src="{{ url_for('static', filename='images/messi-barcelona.jpg') }}" 
+            alt="Lionel Messi wearing FC Barcelona colors during a match" 
+            class="img-fluid rounded-4 shadow-lg border border-secondary border-opacity-25"
+            style="max-height: 480px; object-fit: cover; transform: rotate(-3deg); transition: transform 0.4s ease;"
+            onmouseover="this.style.transform='rotate(0deg) scale(1.02)'"
+            onmouseout="this.style.transform='rotate(-3deg) scale(1)'"
+          >
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- POPULAR CLUBS CIRCLE BAR -->
+<section class="py-5" style="background: #0d121e; border-bottom: 1px solid rgba(255,255,255,0.05);">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-end mb-4">
+      <div>
+        <span class="section-tag">Clubs</span>
+        <h3 class="section-title mb-0">Popular Football Clubs</h3>
+      </div>
+      <a href="{{ url_for('products.list_products') }}" class="btn btn-sm btn-jh-outline">View All</a>
+    </div>
+
+    <div class="row row-cols-3 row-cols-sm-4 row-cols-md-6 row-cols-lg-8 g-3 text-center justify-content-center">
+      {% for team in popular_clubs %}
+        <div class="col">
+          <a href="{{ url_for('products.list_products', team=team.slug) }}" class="category-circle-card">
+            <div class="category-circle-img-wrap d-flex align-items-center justify-content-center p-3">
+              {% if team.logo_url %}
+                <img src="{{ team.logo_url }}" alt="{{ team.name }} crest" class="team-crest-image" loading="lazy" onerror="this.hidden=true; this.nextElementSibling.hidden=false;">
+              {% endif %}
+              <span class="team-crest-fallback fs-1 fw-bold text-white" {% if team.logo_url %}hidden{% endif %}><i class="bi bi-shield-shaded"></i></span>
+            </div>
+            <div class="category-circle-title text-truncate">{{ team.name }}</div>
+          </a>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- FEATURED JERSEYS -->
+<section class="py-5">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-end mb-4">
+      <div>
+        <span class="section-tag">Handpicked</span>
+        <h2 class="section-title mb-0">Featured Jerseys</h2>
+      </div>
+      <a href="{{ url_for('products.list_products', sort='featured') }}" class="btn btn-sm btn-jh-outline">
+        View All <i class="bi bi-arrow-right ms-1"></i>
+      </a>
+    </div>
+
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+      {% for product in featured_jerseys %}
+        <div class="col">
+          <div class="product-card">
+            <div class="product-img-wrap">
+              <a href="{{ url_for('products.detail', slug=product.slug) }}">
+                <img src="{{ product.primary_image }}" alt="{{ product.name }}" class="product-img" loading="lazy">
+              </a>
+              <div class="product-badge-group">
+                {% if product.has_discount %}
+                  <span class="p-badge p-badge-sale">-{{ product.discount_percent }}% OFF</span>
+                {% endif %}
+                {% if product.is_bestseller %}
+                  <span class="p-badge p-badge-bestseller">Top Seller</span>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="product-body">
+              <div class="product-meta">
+                <span class="product-team">
+                  {% if product.team.logo_url %}
+                    <img src="{{ product.team.logo_url }}" alt="" class="product-team-logo" loading="lazy" onerror="this.hidden=true;">
+                  {% endif %}
+                  {{ product.team.name }}
+                </span>
+                <span>{{ product.season }}</span>
+              </div>
+              <a href="{{ url_for('products.detail', slug=product.slug) }}" class="product-name">
+                {{ product.name }}
+              </a>
+              <div class="product-rating">
+                <i class="bi bi-star-fill"></i>
+                <span class="fw-bold">{{ product.average_rating }}</span>
+                <span class="text-muted">({{ product.review_count }})</span>
+              </div>
+
+              <div class="product-price-row">
+                <span class="current-price">₹{{ "%.2f"|format(product.effective_price) }}</span>
+                {% if product.has_discount %}
+                  <span class="original-price">₹{{ "%.2f"|format(product.price) }}</span>
+                {% endif %}
+              </div>
+
+              <a href="{{ url_for('products.detail', slug=product.slug) }}" class="btn btn-jh-outline card-quick-add">
+                Select Size & Buy
+              </a>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- NATIONAL TEAMS SHOWCASE -->
+<section class="py-5" style="background: #0e1526; border-top: 1px solid rgba(255,255,255,0.06); border-bottom: 1px solid rgba(255,255,255,0.06);">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-end mb-4">
+      <div>
+        <span class="section-tag">International Glory</span>
+        <h2 class="section-title mb-0">National Teams</h2>
+      </div>
+      <a href="{{ url_for('products.list_products', category='national-teams') }}" class="btn btn-sm btn-jh-outline">
+        View All Countries <i class="bi bi-arrow-right ms-1"></i>
+      </a>
+    </div>
+
+    <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-7 g-3 text-center">
+      {% for team in national_teams %}
+        <div class="col">
+          <a href="{{ url_for('products.list_products', team=team.slug) }}" class="category-circle-card">
+            <div class="category-circle-img-wrap d-flex align-items-center justify-content-center p-3">
+              {% if team.logo_url %}
+                <img src="{{ team.logo_url }}" alt="{{ team.name }} crest" class="team-crest-image" loading="lazy" onerror="this.hidden=true; this.nextElementSibling.hidden=false;">
+              {% endif %}
+              <span class="team-crest-fallback fs-1 fw-bold text-info" {% if team.logo_url %}hidden{% endif %}><i class="bi bi-flag-fill"></i></span>
+            </div>
+            <div class="category-circle-title text-truncate">{{ team.name }}</div>
+          </a>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- NEW ARRIVALS & BEST SELLERS TABS -->
+<section class="py-5">
+  <div class="container">
+    
+    <div class="row mb-4 align-items-center">
+      <div class="col-md-6">
+        <span class="section-tag">Fresh Kits</span>
+        <h2 class="section-title mb-0">New Arrivals & Best Sellers</h2>
+      </div>
+      <div class="col-md-6 text-md-end mt-3 mt-md-0">
+        <ul class="nav nav-pills d-inline-flex bg-dark p-1 rounded-3 border border-secondary border-opacity-25" id="pills-tab" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active py-1 px-3 text-white" id="pills-new-tab" data-bs-toggle="pill" data-bs-target="#pills-new" type="button" role="tab">New Arrivals</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link py-1 px-3 text-white" id="pills-bestsellers-tab" data-bs-toggle="pill" data-bs-target="#pills-bestsellers" type="button" role="tab">Best Sellers</button>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="tab-content" id="pills-tabContent">
+      <!-- New Arrivals Pane -->
+      <div class="tab-pane fade show active" id="pills-new" role="tabpanel">
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+          {% for product in new_arrivals %}
+            <div class="col">
+              <div class="product-card">
+                <div class="product-img-wrap">
+                  <a href="{{ url_for('products.detail', slug=product.slug) }}">
+                    <img src="{{ product.primary_image }}" alt="{{ product.name }}" class="product-img" loading="lazy">
+                  </a>
+                  <div class="product-badge-group">
+                    <span class="p-badge p-badge-new">NEW</span>
+                    {% if product.has_discount %}
+                      <span class="p-badge p-badge-sale">-{{ product.discount_percent }}%</span>
+                    {% endif %}
+                  </div>
+                </div>
+
+                <div class="product-body">
+                  <div class="product-meta">
+                    <span class="product-team">
+                      {% if product.team.logo_url %}
+                        <img src="{{ product.team.logo_url }}" alt="" class="product-team-logo" loading="lazy" onerror="this.hidden=true;">
+                      {% endif %}
+                      {{ product.team.name }}
+                    </span>
+                    <span>{{ product.kit_type }} Kit</span>
+                  </div>
+                  <a href="{{ url_for('products.detail', slug=product.slug) }}" class="product-name">
+                    {{ product.name }}
+                  </a>
+                  <div class="product-price-row">
+                    <span class="current-price">₹{{ "%.2f"|format(product.effective_price) }}</span>
+                    {% if product.has_discount %}
+                      <span class="original-price">₹{{ "%.2f"|format(product.price) }}</span>
+                    {% endif %}
+                  </div>
+                  <a href="{{ url_for('products.detail', slug=product.slug) }}" class="btn btn-jh-outline card-quick-add">
+                    View Details
+                  </a>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Best Sellers Pane -->
+      <div class="tab-pane fade" id="pills-bestsellers" role="tabpanel">
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+          {% for product in best_sellers %}
+            <div class="col">
+              <div class="product-card">
+                <div class="product-img-wrap">
+                  <a href="{{ url_for('products.detail', slug=product.slug) }}">
+                    <img src="{{ product.primary_image }}" alt="{{ product.name }}" class="product-img" loading="lazy">
+                  </a>
+                  <div class="product-badge-group">
+                    <span class="p-badge p-badge-bestseller">HOT</span>
+                  </div>
+                </div>
+
+                <div class="product-body">
+                  <div class="product-meta">
+                    <span class="product-team">
+                      {% if product.team.logo_url %}
+                        <img src="{{ product.team.logo_url }}" alt="" class="product-team-logo" loading="lazy" onerror="this.hidden=true;">
+                      {% endif %}
+                      {{ product.team.name }}
+                    </span>
+                    <span>{{ product.season }}</span>
+                  </div>
+                  <a href="{{ url_for('products.detail', slug=product.slug) }}" class="product-name">
+                    {{ product.name }}
+                  </a>
+                  <div class="product-price-row">
+                    <span class="current-price">₹{{ "%.2f"|format(product.effective_price) }}</span>
+                    {% if product.has_discount %}
+                      <span class="original-price">₹{{ "%.2f"|format(product.price) }}</span>
+                    {% endif %}
+                  </div>
+                  <a href="{{ url_for('products.detail', slug=product.slug) }}" class="btn btn-jh-outline card-quick-add">
+                    View Details
+                  </a>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- SPECIAL OFFERS BANNER -->
+{% if special_offer %}
+<section class="py-4">
+  <div class="container">
+    <div class="offer-banner">
+      <div class="row align-items-center g-4">
+        <div class="col-lg-7">
+          <span class="badge bg-danger mb-2 px-3 py-2 fw-bold">LIMITED TIME FLASH DEAL</span>
+          <h2 class="display-6 fw-bold text-white mb-2">{{ special_offer.name }}</h2>
+          <p class="text-white-50 mb-4" style="max-width: 520px;">
+            Grab this iconic jersey before stock runs out! Special discounted price with free expedited shipping included.
+          </p>
+          <div class="d-flex align-items-center gap-3">
+            <span class="display-5 fw-bold text-success">₹{{ "%.2f"|format(special_offer.effective_price) }}</span>
+            <span class="fs-4 text-white-50 text-decoration-line-through">₹{{ "%.2f"|format(special_offer.price) }}</span>
+            <span class="badge bg-success fs-6">SAVE {{ special_offer.discount_percent }}%</span>
+          </div>
+          <div class="mt-4">
+            <a href="{{ url_for('products.detail', slug=special_offer.slug) }}" class="btn btn-jh-primary btn-lg fs-6 px-4">
+              <i class="bi bi-lightning-charge-fill"></i> Claim This Deal Now
+            </a>
+          </div>
+        </div>
+        <div class="col-lg-5 text-center d-none d-lg-block">
+          <img src="{{ special_offer.primary_image }}" alt="{{ special_offer.name }}" class="img-fluid rounded-3 shadow-lg" style="max-height: 320px; object-fit: cover;">
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- WHY CHOOSE JERSEYHUB -->
+<section class="py-5" style="border-top: 1px solid rgba(255,255,255,0.06); margin-top: 2rem;">
+  <div class="container">
+    <div class="text-center section-header">
+      <span class="section-tag">Quality Promise</span>
+      <h2 class="section-title">Why Choose JerseyHub?</h2>
+      <p class="text-muted mx-auto" style="max-width: 600px;">
+        Engineered for supporters and pitch athletes alike. We combine authentic craftsmanship with world-class customer service.
+      </p>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-md-6 col-lg-3">
+        <div class="feature-box">
+          <div class="feature-icon-wrap">
+            <i class="bi bi-patch-check-fill"></i>
+          </div>
+          <h5 class="feature-title">100% Authentic</h5>
+          <p class="feature-desc">All kits are licensed and verified with official manufacturer serial numbers and tags.</p>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-3">
+        <div class="feature-box">
+          <div class="feature-icon-wrap">
+            <i class="bi bi-truck"></i>
+          </div>
+          <h5 class="feature-title">Fast Global Shipping</h5>
+          <p class="feature-desc">Tracked express dispatch within 24 hours. Free delivery on orders over ₹6,000.</p>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-3">
+        <div class="feature-box">
+          <div class="feature-icon-wrap">
+            <i class="bi bi-shield-lock-fill"></i>
+          </div>
+          <h5 class="feature-title">Secure Payments</h5>
+          <p class="feature-desc">Simulated and encrypted payments via Cards, UPI, PayPal, or Cash on Delivery.</p>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-3">
+        <div class="feature-box">
+          <div class="feature-icon-wrap">
+            <i class="bi bi-arrow-repeat"></i>
+          </div>
+          <h5 class="feature-title">30-Day Easy Returns</h5>
+          <p class="feature-desc">Wrong size? No problem! Hassle-free exchanges and instant refunds.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

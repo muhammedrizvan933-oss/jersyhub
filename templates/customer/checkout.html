@@ -1,0 +1,188 @@
+{% extends 'base.html' %}
+
+{% block title %}Checkout | JerseyHub{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="mb-4">
+    <h2 class="fw-bold text-white mb-1"><i class="bi bi-shield-lock-fill text-success me-2"></i>Secure Checkout</h2>
+    <p class="text-muted small">Please confirm your shipping address and select a simulated payment method.</p>
+  </div>
+
+  <form action="{{ url_for('checkout.checkout') }}" method="POST" id="checkoutForm">
+    <div class="row g-4">
+      
+      <!-- LEFT: SHIPPING & PAYMENT DETAILS -->
+      <div class="col-lg-7">
+        
+        <!-- 1. SHIPPING ADDRESS -->
+        <div class="card bg-dark border-secondary border-opacity-25 rounded-3 p-4 mb-4">
+          <h5 class="fw-bold text-white mb-3"><i class="bi bi-geo-alt-fill text-info me-2"></i>1. Shipping Address</h5>
+          
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Full Name *</label>
+              <input type="text" name="shipping_name" class="form-control" value="{{ current_user.full_name or current_user.username }}" required>
+            </div>
+            
+            <div class="col-md-6">
+              <label class="form-label">Contact Phone *</label>
+              <input type="tel" name="shipping_phone" class="form-control" value="{{ current_user.phone or '' }}" placeholder="+1 (555) 000-0000" required>
+            </div>
+
+            <div class="col-12">
+              <label class="form-label">Delivery Street Address *</label>
+              <input type="text" name="shipping_address" class="form-control" value="{{ current_user.address or '' }}" placeholder="Apartment, suite, unit, building, floor, etc." required>
+            </div>
+
+            <div class="col-md-5">
+              <label class="form-label">City *</label>
+              <input type="text" name="shipping_city" class="form-control" value="{{ current_user.city or '' }}" required>
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label">State / Province</label>
+              <input type="text" name="shipping_state" class="form-control" value="{{ current_user.state or '' }}">
+            </div>
+
+            <div class="col-md-3">
+              <label class="form-label">Postal / ZIP *</label>
+              <input type="text" name="shipping_postal_code" class="form-control" value="{{ current_user.postal_code or '' }}" required>
+            </div>
+
+            <div class="col-12">
+              <label class="form-label">Country</label>
+              <input type="text" name="shipping_country" class="form-control" value="{{ current_user.country or 'India' }}" required>
+            </div>
+
+            <div class="col-12">
+              <label class="form-label">Delivery Notes / Landmark (Optional)</label>
+              <textarea name="notes" rows="2" class="form-control" placeholder="E.g., Ring buzzer #4, leave by front desk"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. SIMULATED PAYMENT METHOD -->
+        <div class="card bg-dark border-secondary border-opacity-25 rounded-3 p-4">
+          <h5 class="fw-bold text-white mb-3"><i class="bi bi-wallet2 text-success me-2"></i>2. Simulated Payment Gateway</h5>
+          
+          <div class="alert alert-info border-info small py-2 mb-3">
+            <i class="bi bi-info-circle-fill me-1"></i> <strong>Simulation Mode</strong>: This is a demo gateway for college DBMS evaluation. No real currency is charged.
+          </div>
+
+          <div class="d-flex flex-column gap-3">
+            
+            <!-- Option 1: Credit / Debit Card -->
+            <div class="p-3 rounded-3 border border-secondary border-opacity-50 bg-secondary bg-opacity-10">
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="payment_method" id="pay_card" value="Credit/Debit Card" checked onchange="togglePaymentFields('card')">
+                <label class="form-check-label fw-bold text-white d-flex justify-content-between align-items-center w-100" for="pay_card">
+                  <span><i class="bi bi-credit-card-2-front me-2 text-warning"></i> Credit / Debit Card</span>
+                  <span class="text-white-50 small">Visa, Mastercard, Amex</span>
+                </label>
+              </div>
+
+              <div id="card-fields" class="mt-3 pt-3 border-top border-secondary border-opacity-25">
+                <div class="row g-2">
+                  <div class="col-12">
+                    <label class="form-label small text-muted">Card Number (Simulated)</label>
+                    <input type="text" class="form-control form-control-sm" placeholder="4242 •••• •••• 4242" value="4242 8899 7766 4242">
+                  </div>
+                  <div class="col-6">
+                    <label class="form-label small text-muted">Expiry (MM/YY)</label>
+                    <input type="text" class="form-control form-control-sm" placeholder="12/28" value="12/28">
+                  </div>
+                  <div class="col-6">
+                    <label class="form-label small text-muted">CVV</label>
+                    <input type="password" maxlength="4" class="form-control form-control-sm" placeholder="•••" value="888">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Option 2: UPI Instant -->
+            <div class="p-3 rounded-3 border border-secondary border-opacity-50 bg-secondary bg-opacity-10">
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="payment_method" id="pay_upi" value="UPI" onchange="togglePaymentFields('upi')">
+                <label class="form-check-label fw-bold text-white d-flex justify-content-between align-items-center w-100" for="pay_upi">
+                  <span><i class="bi bi-qr-code me-2 text-info"></i> UPI / Fast Pay</span>
+                  <span class="text-white-50 small">Google Pay, PhonePe, Paytm</span>
+                </label>
+              </div>
+
+              <div id="upi-fields" class="mt-3 pt-3 border-top border-secondary border-opacity-25 d-none">
+                <label class="form-label small text-muted">Virtual Payment Address (VPA)</label>
+                <input type="text" class="form-control form-control-sm" placeholder="username@upi" value="footballfan@okaxis">
+              </div>
+            </div>
+
+            <!-- Option 3: Cash on Delivery -->
+            <div class="p-3 rounded-3 border border-secondary border-opacity-50 bg-secondary bg-opacity-10">
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="payment_method" id="pay_cod" value="Cash on Delivery" onchange="togglePaymentFields('cod')">
+                <label class="form-check-label fw-bold text-white" for="pay_cod">
+                  <i class="bi bi-cash-coin me-2 text-success"></i> Cash on Delivery (COD)
+                </label>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT: ORDER REVIEW -->
+      <div class="col-lg-5">
+        <div class="card bg-dark border-secondary border-opacity-25 rounded-3 p-4 sticky-top" style="top: 80px;">
+          <h5 class="fw-bold text-white mb-3 pb-2 border-bottom border-secondary border-opacity-25">Order Items ({{ items|length }})</h5>
+
+          <div class="d-flex flex-column gap-3 mb-4 max-h-300 overflow-auto pe-1" style="max-height: 280px;">
+            {% for itm in items %}
+              <div class="d-flex align-items-center gap-3">
+                <img src="{{ itm.cart_item.product.primary_image }}" class="rounded" style="width: 50px; height: 50px; object-fit: cover;">
+                <div class="flex-grow-1">
+                  <div class="fw-bold text-white small text-truncate" style="max-width: 200px;">{{ itm.cart_item.product.name }}</div>
+                  <div class="text-muted small">Size: {{ itm.cart_item.variant.size }} × {{ itm.cart_item.quantity }}</div>
+                </div>
+                <div class="fw-bold text-success small">₹{{ "%.2f"|format(itm.line_total) }}</div>
+              </div>
+            {% endfor %}
+          </div>
+
+          <div class="border-top border-secondary border-opacity-25 pt-3">
+            <div class="d-flex justify-content-between mb-2">
+              <span class="text-white-50">Subtotal</span>
+              <span class="text-white">₹{{ "%.2f"|format(subtotal) }}</span>
+            </div>
+            <div class="d-flex justify-content-between mb-2">
+              <span class="text-white-50">Shipping</span>
+              <span class="{% if shipping_fee == 0 %}text-success fw-bold{% else %}text-white{% endif %}">
+                {% if shipping_fee == 0 %}FREE{% else %}₹{{ "%.2f"|format(shipping_fee) }}{% endif %}
+              </span>
+            </div>
+            <div class="d-flex justify-content-between fs-5 fw-bold text-white border-top border-secondary border-opacity-25 pt-3 mb-4">
+              <span>Total to Pay</span>
+              <span class="text-success">₹{{ "%.2f"|format(grand_total) }}</span>
+            </div>
+
+            <button type="submit" class="btn btn-jh-primary w-100 py-3 fs-6">
+              <i class="bi bi-lock-fill me-1"></i> Authorize & Place Order (₹{{ "%.2f"|format(grand_total) }})
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </form>
+</div>
+
+<script>
+function togglePaymentFields(type) {
+  const cardFields = document.getElementById('card-fields');
+  const upiFields = document.getElementById('upi-fields');
+  if (cardFields) cardFields.classList.toggle('d-none', type !== 'card');
+  if (upiFields) upiFields.classList.toggle('d-none', type !== 'upi');
+}
+</script>
+{% endblock %}

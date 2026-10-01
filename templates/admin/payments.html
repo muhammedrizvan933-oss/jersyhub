@@ -1,0 +1,105 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}Payments | JerseyHub Admin{% endblock %}
+{% block page_title %}Payment Transactions Management{% endblock %}
+
+{% block content %}
+<!-- SUMMARY & FILTERS -->
+<div class="row g-4 mb-4">
+  <div class="col-md-4">
+    <div class="card bg-dark border-secondary border-opacity-25 rounded-3 p-4">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <span class="text-muted small text-uppercase fw-bold">Settled Funds</span>
+          <h3 class="fw-bold text-success mb-0">₹{{ "%.2f"|format(total_collected) }}</h3>
+        </div>
+        <div class="rounded-circle bg-success bg-opacity-10 text-success p-3 fs-3">
+          <i class="bi bi-cash-stack"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-8">
+    <div class="card bg-dark border-secondary border-opacity-25 rounded-3 p-4 h-100 d-flex justify-content-center">
+      <form action="{{ url_for('admin.payments') }}" method="GET" class="row g-2">
+        <div class="col-sm-6">
+          <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
+            <option value="">All Payment Statuses</option>
+            <option value="Completed" {% if status_filter == 'Completed' %}selected{% endif %}>Completed</option>
+            <option value="Pending" {% if status_filter == 'Pending' %}selected{% endif %}>Pending</option>
+            <option value="Failed" {% if status_filter == 'Failed' %}selected{% endif %}>Failed</option>
+          </select>
+        </div>
+        <div class="col-sm-6">
+          <select name="method" class="form-select form-select-sm" onchange="this.form.submit()">
+            <option value="">All Payment Methods</option>
+            <option value="Credit/Debit Card" {% if method_filter == 'Credit/Debit Card' %}selected{% endif %}>Credit / Debit Card</option>
+            <option value="UPI" {% if method_filter == 'UPI' %}selected{% endif %}>UPI</option>
+            <option value="Cash on Delivery" {% if method_filter == 'Cash on Delivery' %}selected{% endif %}>Cash on Delivery</option>
+          </select>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="admin-table">
+  <div class="table-responsive">
+    <table class="table mb-0 align-middle">
+      <thead>
+        <tr>
+          <th>Transaction ID</th>
+          <th>Order Number</th>
+          <th>Customer</th>
+          <th>Method</th>
+          <th>Amount</th>
+          <th>Status</th>
+          <th>Paid Timestamp</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in payments %}
+          <tr>
+            <td>
+              <strong class="font-monospace text-success small">{{ p.transaction_id }}</strong>
+            </td>
+            <td>
+              <a href="{{ url_for('admin.order_detail', order_id=p.order_id) }}" class="text-white text-decoration-none font-monospace small">
+                {{ p.order.order_number if p.order else ('Order #' ~ p.order_id) }}
+              </a>
+            </td>
+            <td>
+              <span class="text-white small">{{ p.order.shipping_name if p.order else 'Guest' }}</span>
+            </td>
+            <td>
+              <span class="badge bg-secondary">{{ p.payment_method }}</span>
+            </td>
+            <td>
+              <strong class="text-white">₹{{ "%.2f"|format(p.amount) }}</strong>
+            </td>
+            <td>
+              {% if p.payment_status == 'Completed' %}
+                <span class="badge bg-success">Completed</span>
+              {% elif p.payment_status == 'Pending' %}
+                <span class="badge bg-warning text-dark">Pending</span>
+              {% else %}
+                <span class="badge bg-danger">{{ p.payment_status }}</span>
+              {% endif %}
+            </td>
+            <td class="text-muted small">
+              {{ p.paid_at.strftime('%b %d, %Y at %I:%M %p') }}
+            </td>
+          </tr>
+        {% else %}
+          <tr>
+            <td colspan="7" class="text-center py-4 text-muted">
+              No payment transactions found matching the filter.
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
