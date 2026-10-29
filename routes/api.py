@@ -1,7 +1,7 @@
 from functools import wraps
 from flask import Blueprint, jsonify, request, session
 from flask_login import current_user
-from models import Product, Category, Team, CartItem, Order
+from models import Product, Category, Team, CartItem, Order, OrderItem
 from extensions import db
 from sqlalchemy import func
 from datetime import datetime
@@ -67,4 +67,70 @@ def admin_sales_chart():
         'labels': labels,
         'revenue': revenue,
         'orders': order_counts
+    })
+
+
+@api_bp.route('/admin/monthly-stats')
+@admin_api_required
+def admin_monthly_stats():
+    """Returns current month's order count and total revenue."""
+    now = datetime.utcnow()
+    month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+
+    result = db.session.query(
+        func.count(Order.id).label('order_count'),
+        func.coalesce(func.sum(Order.total_amount), 0).label('total_revenue')
+    ).filter(
+        Order.status != 'Cancelled',
+        Order.created_at >= month_start
+    ).one()
+
+    return jsonify({
+        'month': now.strftime('%B %Y'),
+        'order_count': int(result.order_count),
+        'total_revenue': float(result.total_revenue)
+    })
+
+
+@api_bp.route('/admin/category-sales')
+@admin_api_required
+def admin_category_sales():
+    """Returns units sold per jersey category for the pie chart (current month)."""
+    now = datetime.utcnow()
+    month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+
+    rows = db.session.query(
+        Category.name.label('category_name'),
+        func.coalesce(func.sum(OrderItem.quantity), 0).label('units_sold'),
+        func.coalesce(func.sum(OrderItem.total_price), 0).label('revenue')
+    ).join(Product, Product.category_id == Category.id)\
+     .join(OrderItem, OrderItem.product_id == Product.id)\
+     .join(Order, Order.id == OrderItem.order_id)\
+     .filter(
+         Order.status != 'Cancelled',
+         Order.created_at >= month_start
+     )\
+     .group_by(Category.name)\
+     .order_by(func.sum(OrderItem.quantity).desc())\
+     .all()
+
+    # Fallback: if no current-month data, return all-time totals
+    if not rows:
+        rows = db.session.query(
+            Category.name.label('category_name'),
+            func.coalesce(func.sum(OrderItem.quantity), 0).label('units_sold'),
+            func.coalesce(func.sum(OrderItem.total_price), 0).label('revenue')
+        ).join(Product, Product.category_id == Category.id)\
+         .join(OrderItem, OrderItem.product_id == Product.id)\
+         .join(Order, Order.id == OrderItem.order_id)\
+         .filter(Order.status != 'Cancelled')\
+         .group_by(Category.name)\
+         .order_by(func.sum(OrderItem.quantity).desc())\
+         .all()
+
+    return jsonify({
+        'month': now.strftime('%B %Y'),
+        'labels': [r.category_name for r in rows],
+        'units_sold': [int(r.units_sold) for r in rows],
+        'revenue': [float(r.revenue) for r in rows]
     })

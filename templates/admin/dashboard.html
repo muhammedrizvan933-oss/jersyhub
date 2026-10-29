@@ -3,6 +3,79 @@
 {% block title %}Dashboard | JerseyHub Admin{% endblock %}
 {% block page_title %}Dashboard & Analytics{% endblock %}
 
+{% block extra_css %}
+<style>
+  /* ── Monthly Tile ── */
+  .monthly-tile {
+    background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+    border: 1px solid rgba(99,202,183,0.25);
+    border-radius: 16px;
+    padding: 1.4rem 1.6rem;
+    position: relative;
+    overflow: hidden;
+    transition: transform .2s, box-shadow .2s;
+  }
+  .monthly-tile:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(99,202,183,.18); }
+  .monthly-tile::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(circle at 80% 20%, rgba(99,202,183,.15) 0%, transparent 65%);
+    pointer-events: none;
+  }
+  .monthly-pulse {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: #63cab7;
+    display: inline-block;
+    margin-right: 6px;
+    animation: pulse-ring 1.6s ease-out infinite;
+  }
+  @keyframes pulse-ring {
+    0%   { box-shadow: 0 0 0 0 rgba(99,202,183,.7); }
+    70%  { box-shadow: 0 0 0 8px rgba(99,202,183,0); }
+    100% { box-shadow: 0 0 0 0 rgba(99,202,183,0); }
+  }
+  .monthly-stat-row { display: flex; gap: 1.5rem; margin-top: .75rem; }
+  .m-stat-box {
+    flex: 1;
+    background: rgba(255,255,255,.06);
+    border-radius: 10px;
+    padding: .75rem 1rem;
+    border: 1px solid rgba(255,255,255,.08);
+  }
+  .m-stat-label { font-size: .7rem; color: rgba(255,255,255,.5); text-transform: uppercase; letter-spacing: .06em; }
+  .m-stat-value { font-size: 1.4rem; font-weight: 800; color: #fff; margin-top: 2px; line-height: 1.2; }
+  .m-stat-value.teal  { color: #63cab7; }
+  .m-stat-value.amber { color: #fbbf24; }
+  .btn-view-more {
+    background: rgba(99,202,183,.15);
+    border: 1px solid rgba(99,202,183,.4);
+    color: #63cab7;
+    border-radius: 8px;
+    font-size: .75rem;
+    font-weight: 600;
+    padding: .35rem .85rem;
+    transition: background .18s;
+  }
+  .btn-view-more:hover { background: rgba(99,202,183,.3); color: #fff; }
+
+  /* ── Modal Pie chart ── */
+  #monthlyCategoryModal .modal-content {
+    background: #0d1117;
+    border: 1px solid rgba(99,202,183,.25);
+    border-radius: 16px;
+    color: #fff;
+  }
+  #monthlyCategoryModal .modal-header {
+    border-bottom: 1px solid rgba(255,255,255,.08);
+    background: linear-gradient(90deg,#0f2027,#203a43);
+    border-radius: 16px 16px 0 0;
+  }
+  .pie-legend-dot { width:12px;height:12px;border-radius:3px;display:inline-block;margin-right:6px; flex-shrink:0; }
+  #categoryPieLoader { color: #63cab7; }
+</style>
+{% endblock %}
+
 {% block content %}
 <!-- STAT CARDS ROW -->
 <div class="row g-4 mb-4">
@@ -67,6 +140,99 @@
     </div>
   </div>
 
+</div>
+
+<!-- ── MONTHLY THIS-MONTH TILE ── -->
+<div class="row g-4 mb-4">
+  <div class="col-12">
+    <div class="monthly-tile">
+      <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+        <div>
+          <div class="d-flex align-items-center mb-1">
+            <span class="monthly-pulse"></span>
+            <span class="text-white fw-bold" style="font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;">This Month's Performance</span>
+          </div>
+          <div class="text-white-50 small" id="monthly-tile-label" style="font-size:.78rem;">Loading...</div>
+        </div>
+        <button class="btn-view-more" id="btnViewMoreMonthly"
+                data-bs-toggle="modal" data-bs-target="#monthlyCategoryModal">
+          <i class="bi bi-pie-chart-fill me-1"></i>View More
+        </button>
+      </div>
+
+      <div class="monthly-stat-row">
+        <div class="m-stat-box">
+          <div class="m-stat-label"><i class="bi bi-cart-check me-1"></i>Orders Placed</div>
+          <div class="m-stat-value teal" id="monthly-order-count">—</div>
+        </div>
+        <div class="m-stat-box">
+          <div class="m-stat-label"><i class="bi bi-currency-rupee me-1"></i>Total Revenue</div>
+          <div class="m-stat-value amber" id="monthly-revenue">—</div>
+        </div>
+        <div class="m-stat-box d-none d-md-block">
+          <div class="m-stat-label"><i class="bi bi-graph-up me-1"></i>Avg. Order Value</div>
+          <div class="m-stat-value" id="monthly-avg" style="color:#c084fc;">—</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── MONTHLY CATEGORY PIE CHART MODAL ── -->
+<div class="modal fade" id="monthlyCategoryModal" tabindex="-1"
+     aria-labelledby="monthlyCategoryModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div>
+          <h5 class="modal-title fw-bold text-white mb-0" id="monthlyCategoryModalLabel">
+            <i class="bi bi-pie-chart-fill text-info me-2"></i>Category Sales Breakdown
+          </h5>
+          <div class="text-white-50 small" id="modal-month-label">This Month</div>
+        </div>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4">
+
+        <!-- Loader -->
+        <div id="categoryPieLoader" class="text-center py-5">
+          <div class="spinner-border" role="status"><span class="visually-hidden">Loading…</span></div>
+          <div class="mt-2 small">Fetching category data…</div>
+        </div>
+
+        <!-- Chart area (hidden until loaded) -->
+        <div id="categoryPieContent" class="d-none">
+          <div class="row align-items-center g-4">
+            <div class="col-md-6" style="position:relative;height:300px;">
+              <canvas id="categoryPieChart"></canvas>
+            </div>
+            <div class="col-md-6">
+              <div class="fw-semibold text-white mb-3" style="font-size:.85rem;">
+                <i class="bi bi-trophy-fill text-warning me-1"></i>Jerseys Sold by League / Category
+              </div>
+              <div id="pieLegend" class="d-flex flex-column gap-2"></div>
+              <div class="mt-4 pt-3 border-top border-secondary border-opacity-25">
+                <div class="row text-center g-2">
+                  <div class="col-6">
+                    <div class="text-white-50" style="font-size:.7rem;">TOTAL ORDERS</div>
+                    <div class="fw-bold text-white" id="modal-total-orders">—</div>
+                  </div>
+                  <div class="col-6">
+                    <div class="text-white-50" style="font-size:.7rem;">TOTAL REVENUE</div>
+                    <div class="fw-bold text-warning" id="modal-total-revenue">—</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div id="noCategoryData" class="d-none text-center py-4 text-muted">
+            <i class="bi bi-inbox fs-1 d-block mb-2"></i>No sales data available for this period.
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- CHART & LOW STOCK ALERTS -->
@@ -196,4 +362,138 @@
   </div>
 
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+  /* ─── Palette for pie slices ─── */
+  const PALETTE = [
+    '#63cab7','#fbbf24','#818cf8','#f472b6','#34d399',
+    '#60a5fa','#fb923c','#a78bfa','#facc15','#38bdf8'
+  ];
+
+  let pieChartInstance = null;
+
+  /* ─── 1. Load monthly stats tile on page load ─── */
+  async function loadMonthlyStats() {
+    try {
+      const res = await fetch('/api/admin/monthly-stats');
+      if (!res.ok) return;
+      const data = await res.json();
+
+      document.getElementById('monthly-tile-label').textContent = data.month;
+      document.getElementById('modal-month-label').textContent  = data.month;
+      document.getElementById('monthly-order-count').textContent = data.order_count.toLocaleString();
+      document.getElementById('modal-total-orders').textContent  = data.order_count.toLocaleString();
+
+      const fmt = v => '₹' + v.toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2});
+      document.getElementById('monthly-revenue').textContent      = fmt(data.total_revenue);
+      document.getElementById('modal-total-revenue').textContent  = fmt(data.total_revenue);
+
+      const avg = data.order_count > 0 ? data.total_revenue / data.order_count : 0;
+      document.getElementById('monthly-avg').textContent = fmt(avg);
+    } catch (e) {
+      console.error('monthly-stats fetch error', e);
+    }
+  }
+
+  /* ─── 2. Load category pie chart when modal opens ─── */
+  async function loadCategoryPie() {
+    const loader  = document.getElementById('categoryPieLoader');
+    const content = document.getElementById('categoryPieContent');
+    const noData  = document.getElementById('noCategoryData');
+    const legend  = document.getElementById('pieLegend');
+
+    loader.classList.remove('d-none');
+    content.classList.add('d-none');
+
+    try {
+      const res = await fetch('/api/admin/category-sales');
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const data = await res.json();
+
+      loader.classList.add('d-none');
+      content.classList.remove('d-none');
+
+      if (!data.labels || data.labels.length === 0) {
+        noData.classList.remove('d-none');
+        return;
+      }
+
+      /* Build legend */
+      legend.innerHTML = '';
+      const totalUnits = data.units_sold.reduce((a, b) => a + b, 0);
+      data.labels.forEach((label, i) => {
+        const pct = totalUnits > 0 ? ((data.units_sold[i] / totalUnits) * 100).toFixed(1) : 0;
+        const rev = '₹' + data.revenue[i].toLocaleString('en-IN', {minimumFractionDigits:0, maximumFractionDigits:0});
+        const color = PALETTE[i % PALETTE.length];
+        legend.insertAdjacentHTML('beforeend', `
+          <div class="d-flex align-items-center justify-content-between p-2 rounded"
+               style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);">
+            <div class="d-flex align-items-center gap-2">
+              <span class="pie-legend-dot" style="background:${color};"></span>
+              <span class="text-white small fw-semibold">${label}</span>
+            </div>
+            <div class="text-end">
+              <span class="badge" style="background:rgba(255,255,255,.08);color:#ccc;font-size:.72rem;">${data.units_sold[i]} units · ${pct}%</span>
+              <div class="text-white-50" style="font-size:.68rem;">${rev}</div>
+            </div>
+          </div>
+        `);
+      });
+
+      /* Destroy old chart if exists */
+      if (pieChartInstance) { pieChartInstance.destroy(); pieChartInstance = null; }
+
+      /* Draw doughnut chart */
+      const ctx = document.getElementById('categoryPieChart').getContext('2d');
+      pieChartInstance = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: data.labels,
+          datasets: [{
+            data: data.units_sold,
+            backgroundColor: data.labels.map((_, i) => PALETTE[i % PALETTE.length]),
+            borderColor: '#0d1117',
+            borderWidth: 3,
+            hoverOffset: 14
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: '62%',
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: ctx => ` ${ctx.label}: ${ctx.parsed} units`
+              }
+            }
+          },
+          animation: { animateScale: true, animateRotate: true }
+        }
+      });
+
+    } catch (e) {
+      loader.classList.add('d-none');
+      content.classList.remove('d-none');
+      noData.classList.remove('d-none');
+      console.error('category-sales fetch error', e);
+    }
+  }
+
+  /* ─── Bootstrap modal event ─── */
+  document.addEventListener('DOMContentLoaded', function () {
+    loadMonthlyStats();
+
+    const modalEl = document.getElementById('monthlyCategoryModal');
+    modalEl.addEventListener('show.bs.modal', function () {
+      /* Only re-fetch if chart not already loaded (or use fresh data each time) */
+      loadCategoryPie();
+    });
+  });
+})();
+</script>
 {% endblock %}
